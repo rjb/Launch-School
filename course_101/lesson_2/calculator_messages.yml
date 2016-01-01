@@ -1,16 +1,34 @@
-welcome: "Welcome to Calculator! Enter your name:"
-name_invalid: "Make sure to use a valid name."
-hello_prefix: "Hello,"
-first_number: "What is the first number?"
-second_number: "What is the second number?"
-number_invalid: "Hmm... That doesn't look like a valid number"
-operator_invalid: "Please choose 1, 2, 3, or 4"
-result_prefix: "Result: "
-run_again: "Do you want to perform another calculation? (Y to calculate again)"
-good_bye: "Thank you for using Calculator. Good bye!"
-operator_prompt: |+
-    What operation would you like to perform?
-    1) add
-    2) subtract
-    3) multiply
-    4) divide
+en:
+  welcome: "Welcome to Calculator! Enter your name:"
+  name_invalid: "Make sure to use a valid name."
+  hello_prefix: "Hello,"
+  first_number: "What is the first number?"
+  second_number: "What is the second number?"
+  number_invalid: "Hmm... That doesn't look like a valid number"
+  operator_invalid: "Please choose 1, 2, 3, or 4"
+  result_prefix: "Result: "
+  run_again: "Do you want to perform another calculation? (Y to calculate again)"
+  good_bye: "Thank you for using Calculator. Good bye!"
+  operator_prompt: |+
+      What operation would you like to perform?
+      1) add
+      2) subtract
+      3) multiply
+      4) divide
+es:
+  welcome: "Bienvenidos a la Calculadora Escriba su nombre :"
+  name_invalid: "Asegúrese de utilizar un nombre válido"
+  hello_prefix: "Hola,"
+  first_number: "¿Cuál es el primer número?"
+  second_number: "¿Cuál es el segundo número?"
+  number_invalid: "Eso no se ve como un número válido"
+  operator_invalid: "Por favor seleccione 1 , 2 , 3 , o 4"
+  result_prefix: "Resultado: "
+  run_again: "¿Quieres realizar otro cálculo? (Y a calcular de nuevo)"
+  good_bye: "Gracias por usar calculadora ti. ¡Adiós!"
+  operator_prompt: |+
+      ¿Qué operación desea realizar?
+      1) añadir
+      2) sustraer
+      3) multiplicar
+      4) dividir

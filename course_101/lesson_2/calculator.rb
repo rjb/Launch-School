@@ -31,47 +31,47 @@ def operation_to_message(op)
   msg
 end
 
-prompt(MESSAGES['welcome'])
+prompt(MESSAGES['en']['welcome'])
 
 name = ''
 loop do
   name = gets.chomp
 
   if name.empty?
-    prompt(MESSAGES['name_invalid'])
+    prompt(MESSAGES['en']['name_invalid'])
   else
     break
   end
 end
 
-prompt("#{MESSAGES['hello_prefix']} #{name}!")
+prompt("#{MESSAGES['en']['hello_prefix']} #{name}!")
 
 loop do
   number1 = ''
   loop do
-    prompt(MESSAGES['first_number'])
+    prompt(MESSAGES['en']['first_number'])
     number1 = gets.chomp
 
     if number?(number1)
       break
     else
-      prompt(MESSAGES['number_invalid'])
+      prompt(MESSAGES['en']['number_invalid'])
     end
   end
 
   number2 = ''
   loop do
-    prompt(MESSAGES['second_number'])
+    prompt(MESSAGES['en']['second_number'])
     number2 = gets.chomp
 
     if number?(number2)
       break
     else
-      prompt(MESSAGES['number_invalid'])
+      prompt(MESSAGES['en']['number_invalid'])
     end
   end
 
-  prompt(MESSAGES['operator_prompt'])
+  prompt(MESSAGES['en']['operator_prompt'])
 
   operator = ''
   loop do
@@ -80,7 +80,7 @@ loop do
     if %w(1 2 3 4).include?(operator)
       break
     else
-      prompt(MESSAGES['operator_invalid'])
+      prompt(MESSAGES['en']['operator_invalid'])
     end
   end
 
@@ -97,11 +97,11 @@ loop do
              number1.to_f / number2.to_f
            end
 
-  prompt("#{MESSAGES['result_prefix']} #{result}")
+  prompt("#{MESSAGES['en']['result_prefix']} #{result}")
 
-  prompt(MESSAGES['run_again'])
+  prompt(MESSAGES['en']['run_again'])
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
-prompt(MESSAGES['good_bye'])
+prompt(MESSAGES['en']['good_bye'])
