@@ -6,6 +6,14 @@ def integer?(num)
   num.to_i.to_s == num
 end
 
+def float?(num)
+  num.to_f.to_s == num
+end
+
+def number?(input)
+  float?(input) || integer?(input)
+end
+
 def operation_to_message(op)
   case op
   when '1'
@@ -40,7 +48,7 @@ loop do
     prompt("What is the first number?")
     number1 = gets.chomp
 
-    if integer?(number1)
+    if number?(number1)
       break
     else
       prompt("Hmm... That doesn't look like a valid number")
@@ -52,7 +60,7 @@ loop do
     prompt("What is the second number?")
     number2 = gets.chomp
 
-    if integer?(number2)
+    if number?(number2)
       break
     else
       prompt("Hmmm... That doesn't look like a valid number")
