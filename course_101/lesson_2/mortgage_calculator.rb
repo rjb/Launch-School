@@ -1,7 +1,7 @@
 require "yaml"
 
 CURRENCIES = YAML.load_file('mortgage_calculator_currencies.yml')
-currency = CURRENCIES['dollar']
+currency = CURRENCIES['USD']
 
 def integer?(input)
   (/^\d*$/).match(input)
