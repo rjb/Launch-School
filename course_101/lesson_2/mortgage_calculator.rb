@@ -48,7 +48,7 @@ loop do
   monthly_interest_rate = interest_rate.to_f / 100 / 12
   loan_length_months    = loan_length_years.to_i * 12
   monthly_payment       = (loan_amount.to_f * (monthly_interest_rate * (1 + monthly_interest_rate)**loan_length_months)) /
-                           ((1 + monthly_interest_rate)**loan_length_months - 1)
+                          ((1 + monthly_interest_rate)**loan_length_months - 1)
   cost_of_mortgage      = monthly_payment * loan_length_months
 
   prompt("Monthly payment: #{currency}#{monthly_payment.round(2)}")
