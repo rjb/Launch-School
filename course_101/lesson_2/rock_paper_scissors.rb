@@ -6,7 +6,8 @@ def prompt(message)
 end
 
 def reset_scores(scores)
-  scores[:human], scores[:computer] = 0, 0
+  scores[:human] = 0
+  scores[:computer] = 0
 end
 
 def display_welcome_message
