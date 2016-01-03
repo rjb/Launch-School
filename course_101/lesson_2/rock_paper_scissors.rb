@@ -1,34 +1,37 @@
-VALID_CHOICES = %w(rock paper scissors spock lizard)
+VALID_CHOICES = { 'r' => 'rock', 'p' => 'paper', 's' => 'scissors', 'sp' => 'spock', 'l' => 'lizard' }
 
 def prompt(message)
   puts "=> #{message}"
 end
 
 def win?(first, second)
-  (first == 'rock' && second == 'scissors') ||
-    (first == 'rock' && second == 'lizard') ||
-    (first == 'paper' && second == 'rock') ||
-    (first == 'paper' && second == 'spock') ||
-    (first == 'scissors' && second == 'paper') ||
-    (first == 'scissors' && second == 'lizard') ||
-    (first == 'spock' && second == 'rock') ||
-    (first == 'spock' && second == 'scissors') ||
-    (first == 'lizard' && second == 'paper') ||
-    (first == 'lizard' && second == 'spock')
+  # rock crushes scissors and crushses lizard
+  %w(r).product(%w(s l)).include?([first, second]) ||
+    # paper covers rock and disproves spock
+    %w(p).product(%w(r sp)).include?([first, second]) ||
+    # scissors cuts paper and decapitates lizard
+    %w(s).product(%w(p l)).include?([first, second]) ||
+    # spock vaporizes rock and smashes scissors
+    %w(sp).product(%w(r s)).include?([first, second]) ||
+    # lizard eats paper and poisons spock
+    %w(l).product(%w(p sp)).include?([first, second])
 end
 
 loop do
-  choice = ''
+  prompt("Welcome to Rock Paper Scissors Spock Lizard!")
 
+  choice = ''
   loop do
-    prompt("Choose one: #{VALID_CHOICES.join(', ')}")
+    prompt("Choose your weapon wisely:")
+    VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
+
     choice = gets.chomp
-    break if VALID_CHOICES.include?(choice)
+    break if VALID_CHOICES.keys.include?(choice)
   end
 
-  computer_choice = VALID_CHOICES.sample
+  computer_choice = VALID_CHOICES.keys.sample
 
-  prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
+  prompt("You chose: #{VALID_CHOICES[choice]}; Computer chose: #{VALID_CHOICES[computer_choice]}")
 
   if win?(choice, computer_choice)
     prompt("You won!")
