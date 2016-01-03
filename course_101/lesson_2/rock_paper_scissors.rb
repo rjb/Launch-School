@@ -52,6 +52,16 @@ def game_over?(scores)
   scores[:human] == 5 || scores[:computer] == 5
 end
 
+def display_round_results(choice, computer_choice)
+  if win?(choice, computer_choice)
+    prompt("You won the round!")
+  elsif win?(computer_choice, choice)
+    prompt("Computer won the round")
+  else
+    prompt("Round is a draw")
+  end
+end
+
 def display_final_results(scores)
   if scores[:human] == 5
     prompt("GAME OVER: You won!")
@@ -76,13 +86,7 @@ loop do
 
     prompt("You chose: #{VALID_CHOICES[choice.to_sym]}; Computer chose: #{VALID_CHOICES[computer_choice.to_sym]}")
 
-    if win?(choice, computer_choice)
-      prompt("You won the round!")
-    elsif win?(computer_choice, choice)
-      prompt("Computer won the round")
-    else
-      prompt("Round is a draw")
-    end
+    display_round_results(choice, computer_choice)
 
     tally_scores(choice, computer_choice, scores)
 
