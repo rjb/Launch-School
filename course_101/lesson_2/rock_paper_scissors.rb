@@ -5,7 +5,7 @@ def prompt(message)
 end
 
 def win?(first, second)
-  # rock crushes scissors and crushses lizard
+  # rock crushes scissors and crushes lizard
   %w(r).product(%w(s l)).include?([first, second]) ||
     # paper covers rock and disproves spock
     %w(p).product(%w(r sp)).include?([first, second]) ||
