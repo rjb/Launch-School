@@ -1,4 +1,4 @@
-VALID_CHOICES = { 'r' => 'rock', 'p' => 'paper', 's' => 'scissors', 'sp' => 'spock', 'l' => 'lizard' }
+VALID_CHOICES = { r: 'rock', p: 'paper', s: 'scissors', sp: 'spock', l: 'lizard' }
 scores = { human: 0, computer: 0 }
 
 def prompt(message)
@@ -44,12 +44,12 @@ loop do
     VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
 
     choice = gets.chomp
-    break if VALID_CHOICES.keys.include?(choice)
+    break if VALID_CHOICES.keys.include?(choice.to_sym)
   end
 
-  computer_choice = VALID_CHOICES.keys.sample
+  computer_choice = VALID_CHOICES.keys.sample.to_s
 
-  prompt("You chose: #{VALID_CHOICES[choice]}; Computer chose: #{VALID_CHOICES[computer_choice]}")
+  prompt("You chose: #{VALID_CHOICES[choice.to_sym]}; Computer chose: #{VALID_CHOICES[computer_choice.to_sym]}")
 
   if win?(choice, computer_choice)
     prompt("You won the round!")
