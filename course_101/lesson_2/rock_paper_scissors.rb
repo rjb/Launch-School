@@ -18,14 +18,6 @@ def win?(first, second)
     %w(l).product(%w(p sp)).include?([first, second])
 end
 
-def display_scoreboard(scores)
-  puts "---------------"
-  puts "Scoreboard"
-  puts "---------------"
-  scores.each { |player, score| puts "#{player}: #{score}" }
-  puts "---------------"
-end
-
 def display_welcome_message
   puts "--------------------------------------------"
   puts "Welcome to Rock Paper Scissors Spock Lizard!"
@@ -33,6 +25,14 @@ def display_welcome_message
   puts "Your battle against Computer begins now."
   puts "(best to 5 wins)"
   puts "--------------------------------------------"
+end
+
+def display_scoreboard(scores)
+  puts "---------------"
+  puts "Scoreboard"
+  puts "---------------"
+  scores.each { |player, score| puts "#{player}: #{score}" }
+  puts "---------------"
 end
 
 def display_choices
