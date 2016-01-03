@@ -5,19 +5,6 @@ def prompt(message)
   puts "=> #{message}"
 end
 
-def win?(first, second)
-  # rock crushes scissors and crushes lizard
-  %w(r).product(%w(s l)).include?([first, second]) ||
-    # paper covers rock and disproves spock
-    %w(p).product(%w(r sp)).include?([first, second]) ||
-    # scissors cuts paper and decapitates lizard
-    %w(s).product(%w(p l)).include?([first, second]) ||
-    # spock vaporizes rock and smashes scissors
-    %w(sp).product(%w(r s)).include?([first, second]) ||
-    # lizard eats paper and poisons spock
-    %w(l).product(%w(p sp)).include?([first, second])
-end
-
 def display_welcome_message
   puts "--------------------------------------------"
   puts "Welcome to Rock Paper Scissors Spock Lizard!"
@@ -38,6 +25,19 @@ end
 def display_choices
   prompt("Choose your weapon wisely:")
   VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
+end
+
+def win?(first, second)
+  # rock crushes scissors and crushes lizard
+  %w(r).product(%w(s l)).include?([first, second]) ||
+    # paper covers rock and disproves spock
+    %w(p).product(%w(r sp)).include?([first, second]) ||
+    # scissors cuts paper and decapitates lizard
+    %w(s).product(%w(p l)).include?([first, second]) ||
+    # spock vaporizes rock and smashes scissors
+    %w(sp).product(%w(r s)).include?([first, second]) ||
+    # lizard eats paper and poisons spock
+    %w(l).product(%w(p sp)).include?([first, second])
 end
 
 def game_over?(scores)
