@@ -25,7 +25,7 @@ loop do
   
   if win?(choice, computer_choice)
     prompt("You won!")
-  elsif win?(choice, computer_choice)
+  elsif win?(computer_choice, choice)
     prompt("Computer won.")
   else
     prompt("It's a draw!")
