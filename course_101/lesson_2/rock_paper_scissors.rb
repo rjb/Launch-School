@@ -40,6 +40,18 @@ def display_choices
   VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
 end
 
+def game_over?(scores)
+  scores[:human] == 5 || scores[:computer] == 5
+end
+
+def display_final_results(scores)
+  if scores[:human] == 5
+    prompt("GAME OVER: You won!")
+  elsif scores[:computer] == 5
+    prompt("GAME OVER: Computer has defeated you...")
+  end
+end
+
 display_welcome_message
 
 loop do
@@ -67,11 +79,8 @@ loop do
 
   display_scoreboard(scores)
 
-  if scores[:human] == 5
-    prompt("GAME OVER: You won!")
-    break
-  elsif scores[:computer] == 5
-    prompt("GAME OVER: Computer has defeated you...")
+  if game_over?(scores)
+    display_final_results(scores)
     break
   end
 
