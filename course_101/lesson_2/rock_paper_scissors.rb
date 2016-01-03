@@ -10,35 +10,29 @@ def win?(first, second)
     (first == 'scissors' && second == 'paper')
 end
 
-def results(player, computer)
-  if win?(player, computer)
-    "You won!"
-  elsif win?(computer, player)
-    "Computer won."
-  else
-    "It's a draw!"
-  end
-end
-
 loop do
   choice = ''
+
   loop do
     prompt("Choose one: #{VALID_CHOICES.join(', ')}")
     choice = gets.chomp
-
     break if VALID_CHOICES.include?(choice)
-    prompt("Hmm... Please enter a valid choice.")
   end
 
   computer_choice = VALID_CHOICES.sample
 
   prompt("You chose: #{choice}; Computer chose: #{computer_choice}")
-
-  prompt(results(choice, computer_choice))
+  
+  if win?(choice, computer_choice)
+    prompt("You won!")
+  elsif win?(choice, computer_choice)
+    prompt("Computer won.")
+  else
+    prompt("It's a draw!")
+  end
 
   prompt("Play again? (y or n)")
-  answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break unless gets.chomp.downcase.start_with?('y')
 end
 
 prompt("Thank you for playing. Good bye!")
