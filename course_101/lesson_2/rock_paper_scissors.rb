@@ -35,13 +35,17 @@ def display_welcome_message
   puts "--------------------------------------------"
 end
 
+def display_choices
+  prompt("Choose your weapon wisely:")
+  VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
+end
+
 display_welcome_message
 
 loop do
   choice = ''
   loop do
-    prompt("Choose your weapon wisely:")
-    VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
+    display_choices
 
     choice = gets.chomp
     break if VALID_CHOICES.keys.include?(choice.to_sym)
