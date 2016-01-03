@@ -40,6 +40,14 @@ def win?(first, second)
     %w(l).product(%w(p sp)).include?([first, second])
 end
 
+def tally_scores(choice, computer_choice, scores)
+  if win?(choice, computer_choice)
+    scores[:human] += 1
+  elsif win?(computer_choice, choice)
+    scores[:computer] += 1
+  end
+end
+
 def game_over?(scores)
   scores[:human] == 5 || scores[:computer] == 5
 end
@@ -70,13 +78,13 @@ loop do
 
     if win?(choice, computer_choice)
       prompt("You won the round!")
-      scores[:human] += 1
     elsif win?(computer_choice, choice)
       prompt("Computer won the round")
-      scores[:computer] += 1
     else
       prompt("Round is a draw")
     end
+
+    tally_scores(choice, computer_choice, scores)
 
     display_scoreboard(scores)
 
