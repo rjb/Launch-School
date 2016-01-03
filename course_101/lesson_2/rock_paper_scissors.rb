@@ -1,4 +1,5 @@
 VALID_CHOICES = { 'r' => 'rock', 'p' => 'paper', 's' => 'scissors', 'sp' => 'spock', 'l' => 'lizard' }
+scores = { human: 0, computer: 0 }
 
 def prompt(message)
   puts "=> #{message}"
@@ -17,9 +18,26 @@ def win?(first, second)
     %w(l).product(%w(p sp)).include?([first, second])
 end
 
-loop do
-  prompt("Welcome to Rock Paper Scissors Spock Lizard!")
+def display_scoreboard(scores)
+  puts "---------------"
+  puts "Scoreboard"
+  puts "---------------"
+  scores.each { |player, score| puts "#{player}: #{score}" }
+  puts "---------------"
+end
 
+def display_welcome_message
+  puts "--------------------------------------------"
+  puts "Welcome to Rock Paper Scissors Spock Lizard!"
+  puts "--------------------------------------------"
+  puts "Your battle against Computer begins now."
+  puts "(best to 5 wins)"
+  puts "--------------------------------------------"
+end
+
+display_welcome_message
+
+loop do
   choice = ''
   loop do
     prompt("Choose your weapon wisely:")
@@ -34,15 +52,27 @@ loop do
   prompt("You chose: #{VALID_CHOICES[choice]}; Computer chose: #{VALID_CHOICES[computer_choice]}")
 
   if win?(choice, computer_choice)
-    prompt("You won!")
+    prompt("You won the round!")
+    scores[:human] += 1
   elsif win?(computer_choice, choice)
-    prompt("Computer won.")
+    prompt("Computer won the round")
+    scores[:computer] += 1
   else
-    prompt("It's a draw!")
+    prompt("Round is a draw")
   end
 
-  prompt("Play again? (y or n)")
-  break unless gets.chomp.downcase.start_with?('y')
+  display_scoreboard(scores)
+
+  if scores[:human] == 5
+    prompt("GAME OVER: You won!")
+    break
+  elsif scores[:computer] == 5
+    prompt("GAME OVER: Computer has defeated you...")
+    break
+  end
+
+  prompt("Press the <enter> to play another round, or forfeit (f)")
+  break if gets.chomp.downcase.start_with?('f')
 end
 
-prompt("Thank you for playing. Good bye!")
+# prompt("Thank you for playing. Good bye!")
