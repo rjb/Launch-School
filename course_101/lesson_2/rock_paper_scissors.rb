@@ -9,8 +9,8 @@ def display_welcome_message
   puts "--------------------------------------------"
   puts "Welcome to Rock Paper Scissors Spock Lizard!"
   puts "--------------------------------------------"
+  puts "The first to 5 wins."
   puts "Your battle against Computer begins now."
-  puts "(best to 5 wins)"
   puts "--------------------------------------------"
 end
 
