@@ -97,7 +97,7 @@ loop do
       break
     end
 
-    prompt("Press <enter> to play another round, or forfeit (f)")
+    prompt("Ready? Press <enter> or forfeit (f)")
     break if gets.chomp.downcase.start_with?('f')
   end
 
