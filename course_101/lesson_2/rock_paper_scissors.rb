@@ -5,6 +5,10 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+def reset_scores(scores)
+  scores[:human], scores[:computer] = 0, 0
+end
+
 def display_welcome_message
   puts "--------------------------------------------"
   puts "Welcome to Rock Paper Scissors Spock Lizard!"
@@ -76,6 +80,7 @@ end
 
 loop do
   display_welcome_message
+  reset_scores(scores)
 
   loop do
     choice = ''
