@@ -29,7 +29,7 @@ end
 
 def display_choices
   prompt("Choose your weapon wisely:")
-  VALID_CHOICES.each { |k, v| prompt("#{v} (#{k})") }
+  VALID_CHOICES.each { |abbr, name| prompt("#{name} (#{abbr})") }
 end
 
 def win?(first, second)
@@ -58,7 +58,9 @@ def game_over?(scores)
 end
 
 def display_players_choices(choice, computer_choice)
-  prompt("You chose: #{VALID_CHOICES[choice.to_sym]}; Computer chose: #{VALID_CHOICES[computer_choice.to_sym]}")
+  str = "You chose: #{VALID_CHOICES[choice.to_sym]}; "
+  str += "Computer chose: #{VALID_CHOICES[computer_choice.to_sym]}"
+  prompt("#{str}")
 end
 
 def display_round_results(choice, computer_choice)
@@ -93,13 +95,9 @@ loop do
     end
 
     computer_choice = VALID_CHOICES.keys.sample.to_s
-
     display_players_choices(choice, computer_choice)
-
     display_round_results(choice, computer_choice)
-
     tally_scores(choice, computer_choice, scores)
-
     display_scoreboard(scores)
 
     if game_over?(scores)
