@@ -1,6 +1,7 @@
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
+WINNING_SCORE = 5
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
@@ -9,9 +10,14 @@ def prompt(message)
   puts "=> #{message}"
 end
 
-def display_board(board)
+def display_board(board, score)
   system 'clear'
-  puts "You're #{PLAYER_MARKER}, Computer is #{COMPUTER_MARKER}"
+  puts "Welcome to Tic Tac Toe! First to #{WINNING_SCORE} wins."
+  puts "----------------------------------------"
+  puts "Player  |  Computer".rjust(30)
+  puts "  #{PLAYER_MARKER}     |     #{COMPUTER_MARKER}".rjust(26)
+  puts "  #{score[:player]}     |     #{score[:computer]}".rjust(26)
+  puts "----------------------------------------"
   puts ""
   puts "     |     |"
   puts "  #{board[1]}  |  #{board[2]}  |  #{board[3]}"
@@ -25,6 +31,10 @@ def display_board(board)
   puts "  #{board[7]}  |  #{board[8]}  |  #{board[9]}"
   puts "     |     |"
   puts ""
+end
+
+def initialize_score
+  { player: 0, computer: 0 }
 end
 
 def initialize_board
@@ -78,28 +88,51 @@ def detect_winner(board)
   nil
 end
 
+def tally_score(winner, score)
+  return score[winner.downcase.to_sym] += 1 if winner
+  nil
+end
+
+def game_over?(score)
+  score[:player] == WINNING_SCORE || score[:computer] == WINNING_SCORE
+end
+
 loop do
-  board = initialize_board
-
+  score = initialize_score
+  
   loop do
-    display_board(board)
+    board = initialize_board
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+    loop do
+      display_board(board, score)
 
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
+
+    display_board(board, score)
+
+    if someone_won?(board)
+      winner = detect_winner(board)
+
+      tally_score(winner, score)
+      display_board(board, score)
+
+      prompt("#{winner} won!")
+    else
+      prompt("It's a tie.")
+    end
+
+    break if game_over?(score)
+
+    prompt("Ready? Press <enter> or forfeit (f)")
+    break if gets.chomp.downcase.start_with?('f')
   end
 
-  display_board(board)
-
-  if someone_won?(board)
-    prompt("#{detect_winner(board)} won!")
-  else
-    prompt("It's a tie.")
-  end
-
-  prompt("Play again? (y or n)")
+  prompt("Game over. Play again? (y or n)")
   break unless gets.chomp.downcase.start_with?('y')
 end
 
