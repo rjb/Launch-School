@@ -37,8 +37,8 @@ def empty_squares(board)
   board.keys.select { |num| board[num] == INITIAL_MARKER }
 end
 
-def joinor(board, delimiter = ',', conjunction = 'or')
-  board[-1] = " #{conjunction} #{board.last}" if board.size > 1
+def joinor(board, delimiter = ', ', conjunction = 'or')
+  board[-1] = "#{conjunction} #{board.last}" if board.size > 1
   board.join(delimiter)
 end
 
