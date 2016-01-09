@@ -141,8 +141,6 @@ loop do
       
       computer_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
-
-      at_risk_square = find_at_risk_square(board)
     end
 
     display_board(board, score)
