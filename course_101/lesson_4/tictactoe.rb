@@ -1,3 +1,5 @@
+require 'pry'
+
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -65,8 +67,23 @@ def player_places_piece!(board)
 end
 
 def computer_places_piece!(board)
-  square = empty_squares(board).sample
+  square = square_at_risk?(board) ? find_at_risk_square(board) : empty_squares(board).sample
   board[square] = COMPUTER_MARKER
+end
+
+def square_at_risk?(board)
+  !!find_at_risk_square(board)
+end
+
+def find_at_risk_square(board)
+  WINNING_LINES.each do |line|
+    if board.values_at(*line) == [PLAYER_MARKER, PLAYER_MARKER, INITIAL_MARKER]
+      return line[2]
+    elsif board.values_at(*line) == [INITIAL_MARKER, PLAYER_MARKER, PLAYER_MARKER]
+      return line[0]
+    end
+  end
+  nil
 end
 
 def board_full?(board)
@@ -117,13 +134,15 @@ loop do
 
       player_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
-
+      
       computer_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
+
+      at_risk_square = find_at_risk_square(board)
     end
 
     display_board(board, score)
-
+    
     if someone_won?(board)
       winner = detect_winner(board)
 
