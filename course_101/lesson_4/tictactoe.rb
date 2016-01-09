@@ -65,10 +65,10 @@ def player_places_piece!(board)
 end
 
 def computer_places_piece!(board)
-  square = if square_at_risk?(board, COMPUTER_MARKER)
-             find_at_risk_square(board, COMPUTER_MARKER)
-           elsif square_at_risk?(board, PLAYER_MARKER)
-             find_at_risk_square(board, PLAYER_MARKER)
+  square = if square_at_risk?(WINNING_LINES, board, COMPUTER_MARKER)
+             find_at_risk_square(WINNING_LINES, board, COMPUTER_MARKER)
+           elsif square_at_risk?(WINNING_LINES, board, PLAYER_MARKER)
+             find_at_risk_square(WINNING_LINES, board, PLAYER_MARKER)
            elsif middle_square_available?(board)
              middle_square_position(board)
            else
@@ -78,12 +78,12 @@ def computer_places_piece!(board)
   board[square] = COMPUTER_MARKER
 end
 
-def square_at_risk?(board, marker)
-  !!find_at_risk_square(board, marker)
+def square_at_risk?(winning_lines, board, marker)
+  !!find_at_risk_square(winning_lines, board, marker)
 end
 
-def find_at_risk_square(board, marker)
-  WINNING_LINES.each do |line|
+def find_at_risk_square(winning_lines, board, marker)
+  winning_lines.each do |line|
     if board.values_at(*line).count(marker) == 2
       return board.select { |sqr, mkr| line.include?(sqr) && mkr == INITIAL_MARKER }.keys.first
     end
