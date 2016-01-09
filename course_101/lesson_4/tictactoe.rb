@@ -1,3 +1,5 @@
+require 'pry'
+
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -65,42 +67,25 @@ def player_places_piece!(board)
 end
 
 def computer_places_piece!(board)
-  if win_oppotunity?(board)
-    board[find_opportunity_square(board)] = COMPUTER_MARKER
-  elsif square_at_risk?(board)
-    board[find_at_risk_square(board)] = COMPUTER_MARKER
-  else
-    board[empty_squares(board).sample] = COMPUTER_MARKER
-  end
+  square = if square_at_risk?(board, COMPUTER_MARKER)
+             find_at_risk_square(board, COMPUTER_MARKER)
+           elsif square_at_risk?(board, PLAYER_MARKER)
+             find_at_risk_square(board, PLAYER_MARKER)
+           else
+             empty_squares(board).sample
+           end
+
+  board[square] = COMPUTER_MARKER
 end
 
-def square_at_risk?(board)
-  !!find_at_risk_square(board)
+def square_at_risk?(board, marker)
+  !!find_at_risk_square(board, marker)
 end
 
-# finds at risk square when two in a row
-# for any at risk, use something like:
-# if board.values_at(*line).count(PLAYER_MARKER) == 2
-# board.select { |square, marker| line.include?(square) && marker == INITIAL_MARKER}.keys.first
-def find_at_risk_square(board)
+def find_at_risk_square(board, marker)
   WINNING_LINES.each do |line|
-    if board.values_at(*line) == [PLAYER_MARKER, PLAYER_MARKER, INITIAL_MARKER]
-      return line[2]
-    elsif board.values_at(*line) == [INITIAL_MARKER, PLAYER_MARKER, PLAYER_MARKER]
-      return line[0]
-    end
-  end
-  nil
-end
-
-def win_oppotunity?(board)
-  !!find_opportunity_square(board)
-end
-
-def find_opportunity_square(board)
-  WINNING_LINES.each do |line|
-    if board.values_at(*line).count(COMPUTER_MARKER) == 2
-      return board.select { |square, marker| line.include?(square) && marker == INITIAL_MARKER }.keys.first
+    if board.values_at(*line).count(marker) == 2
+      return board.select { |sqr, mkr| line.include?(sqr) && mkr == INITIAL_MARKER }.keys.first
     end
   end
   nil
@@ -173,7 +158,7 @@ loop do
     end
 
     if game_over?(score)
-      prompt("Game over! #{detect_game_winner(score)} won the gam!")
+      prompt("Game over! #{detect_game_winner(score)} won the game!")
       break
     end
 
