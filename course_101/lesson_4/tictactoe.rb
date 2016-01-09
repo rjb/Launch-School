@@ -52,6 +52,23 @@ def joinor(board, delimiter = ', ', conjunction = 'or')
   board.join(delimiter)
 end
 
+def alternate(current_player)
+  if current_player == "Player"
+    "Computer"
+  else
+    "Player"
+  end
+end
+
+def play_piece!(board, current_player)
+  case current_player
+  when "Player"
+    player_places_piece!(board)
+  when "Computer"
+    computer_places_piece!(board)
+  end
+end
+
 def player_places_piece!(board)
   square = ''
   loop do
@@ -138,17 +155,17 @@ end
 
 loop do
   score = initialize_score
-  
+
   loop do
     board = initialize_board
+    current_player = "Player"
 
     loop do
       display_board(board, score)
 
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      
-      computer_places_piece!(board)
+      play_piece!(board, current_player)
+      current_player = alternate(current_player)
+
       break if someone_won?(board) || board_full?(board)
     end
 
