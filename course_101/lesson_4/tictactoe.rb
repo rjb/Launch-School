@@ -71,6 +71,8 @@ def computer_places_piece!(board)
              find_at_risk_square(board, COMPUTER_MARKER)
            elsif square_at_risk?(board, PLAYER_MARKER)
              find_at_risk_square(board, PLAYER_MARKER)
+           elsif middle_square_available?(board)
+             middle_square_position(board)
            else
              empty_squares(board).sample
            end
@@ -89,6 +91,14 @@ def find_at_risk_square(board, marker)
     end
   end
   nil
+end
+
+def middle_square_available?(board)
+  board[middle_square_position(board)] == INITIAL_MARKER
+end
+
+def middle_square_position(board)
+  board.keys[board.keys.size / 2]
 end
 
 def board_full?(board)
