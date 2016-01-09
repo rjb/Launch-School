@@ -197,7 +197,6 @@ loop do
       display_board(board, score)
       play_piece!(board, current_player)
       current_player = alternate(current_player)
-
       break if someone_won?(board) || board_full?(board)
     end
 
