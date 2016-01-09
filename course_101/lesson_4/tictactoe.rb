@@ -97,6 +97,15 @@ def game_over?(score)
   score[:player] == WINNING_SCORE || score[:computer] == WINNING_SCORE
 end
 
+def detect_game_winner(score)
+  if score[:player] == WINNING_SCORE
+    return "Player"
+  elsif score[:computer] == WINNING_SCORE
+    return "Computer"
+  end
+  nil
+end
+
 loop do
   score = initialize_score
   
@@ -126,13 +135,16 @@ loop do
       prompt("It's a tie.")
     end
 
-    break if game_over?(score)
+    if game_over?(score)
+      prompt("Game over! #{detect_game_winner(score)} won the gam!")
+      break
+    end
 
     prompt("Ready? Press <enter> or forfeit (f)")
     break if gets.chomp.downcase.start_with?('f')
   end
 
-  prompt("Game over. Play again? (y or n)")
+  prompt("Play another game? (y or n)")
   break unless gets.chomp.downcase.start_with?('y')
 end
 
