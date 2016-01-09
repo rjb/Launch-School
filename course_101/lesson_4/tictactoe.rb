@@ -1,4 +1,4 @@
-FIRST_PLAYER = 'Choose' # Choose, Player, or Computer
+FIRST_PLAYER = 'choose' # choose, player, or computer
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -158,12 +158,14 @@ def detect_game_winner(score)
   nil
 end
 
-def determine_first_player(player_switch)
+def determine_first_player
   case FIRST_PLAYER
-  when 'Choose'
+  when 'choose'
     choose_first_player
-  else
-    FIRST_PLAYER
+  when 'player'
+    'Player'
+  when 'computer'
+    'Computer'
   end
 end
 
@@ -189,7 +191,7 @@ loop do
   loop do
     board = initialize_board
     display_board(board, score)
-    current_player = determine_first_player(FIRST_PLAYER)
+    current_player = determine_first_player
 
     loop do
       display_board(board, score)
@@ -203,9 +205,9 @@ loop do
       winner = detect_winner(board)
       tally_score(winner, score)
       display_board(board, score)
-
       prompt("#{winner} won!")
     else
+      display_board(board, score)
       prompt("It's a tie.")
     end
 
