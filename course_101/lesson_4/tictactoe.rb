@@ -1,5 +1,3 @@
-require 'pry'
-
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -67,8 +65,13 @@ def player_places_piece!(board)
 end
 
 def computer_places_piece!(board)
-  square = square_at_risk?(board) ? find_at_risk_square(board) : empty_squares(board).sample
-  board[square] = COMPUTER_MARKER
+  if win_oppotunity?(board)
+    board[find_opportunity_square(board)] = COMPUTER_MARKER
+  elsif square_at_risk?(board)
+    board[find_at_risk_square(board)] = COMPUTER_MARKER
+  else
+    board[empty_squares(board).sample] = COMPUTER_MARKER
+  end
 end
 
 def square_at_risk?(board)
@@ -85,6 +88,19 @@ def find_at_risk_square(board)
       return line[2]
     elsif board.values_at(*line) == [INITIAL_MARKER, PLAYER_MARKER, PLAYER_MARKER]
       return line[0]
+    end
+  end
+  nil
+end
+
+def win_oppotunity?(board)
+  !!find_opportunity_square(board)
+end
+
+def find_opportunity_square(board)
+  WINNING_LINES.each do |line|
+    if board.values_at(*line).count(COMPUTER_MARKER) == 2
+      return board.select { |square, marker| line.include?(square) && marker == INITIAL_MARKER }.keys.first
     end
   end
   nil
