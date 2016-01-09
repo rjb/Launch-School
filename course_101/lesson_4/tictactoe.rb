@@ -1,3 +1,4 @@
+FIRST_PLAYER = 'Choose' # Choose, Player, or Computer
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMPUTER_MARKER = 'O'
@@ -52,11 +53,15 @@ def joinor(board, delimiter = ', ', conjunction = 'or')
   board.join(delimiter)
 end
 
+def valid_player?(player)
+  player == "Player" || player == "Computer"
+end
+
 def alternate(current_player)
-  if current_player == "Player"
-    "Computer"
-  else
+  if current_player == "Computer"
     "Player"
+  else
+    "Computer"
   end
 end
 
@@ -153,27 +158,49 @@ def detect_game_winner(score)
   nil
 end
 
+def determine_first_player(player_switch)
+  case FIRST_PLAYER
+  when 'Choose'
+    choose_first_player
+  else
+    FIRST_PLAYER
+  end
+end
+
+def choose_first_player
+  player = ''
+  loop do
+    prompt("Who's first? Player (p) or Computer (c)")
+    player = case gets.chomp.downcase
+             when 'p'
+               'Player'
+             when 'c'
+               'Computer'
+             end
+    break if valid_player?(player)
+    prompt("Please choose a valid player")
+  end
+  player
+end
+
 loop do
   score = initialize_score
 
   loop do
     board = initialize_board
-    current_player = "Player"
+    display_board(board, score)
+    current_player = determine_first_player(FIRST_PLAYER)
 
     loop do
       display_board(board, score)
-
       play_piece!(board, current_player)
       current_player = alternate(current_player)
 
       break if someone_won?(board) || board_full?(board)
     end
 
-    display_board(board, score)
-    
     if someone_won?(board)
       winner = detect_winner(board)
-
       tally_score(winner, score)
       display_board(board, score)
 
