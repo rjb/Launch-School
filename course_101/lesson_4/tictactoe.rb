@@ -11,14 +11,24 @@ def prompt(message)
   puts "=> #{message}"
 end
 
+def welcome_message
+  message = "Welcome to Tic Tac Toe! First to #{WINNING_SCORE} wins.\n"
+  message += "----------------------------------------\n"
+  message
+end
+
+def scoreboard(score)
+  board = "Player  |  Computer".rjust(30) + "\n"
+  board += "  #{PLAYER_MARKER}     |     #{COMPUTER_MARKER}".rjust(26) + "\n"
+  board += "  #{score[:player]}     |     #{score[:computer]}".rjust(26) + "\n"
+  board += "----------------------------------------\n"
+  board
+end
+
 def display_board(board, score)
   system 'clear'
-  puts "Welcome to Tic Tac Toe! First to #{WINNING_SCORE} wins."
-  puts "----------------------------------------"
-  puts "Player  |  Computer".rjust(30)
-  puts "  #{PLAYER_MARKER}     |     #{COMPUTER_MARKER}".rjust(26)
-  puts "  #{score[:player]}     |     #{score[:computer]}".rjust(26)
-  puts "----------------------------------------"
+  puts welcome_message
+  puts scoreboard(score)
   puts ""
   puts "     |     |"
   puts "  #{board[1]}  |  #{board[2]}  |  #{board[3]}"
