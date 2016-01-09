@@ -75,6 +75,9 @@ def square_at_risk?(board)
   !!find_at_risk_square(board)
 end
 
+# finds at risk square when two in a row
+# for any at risk, use something like (inbetween WINNING_LINES loop):
+# board.select { |square, marker| line.include?(square) && marker == INITIAL_MARKER}.keys.first
 def find_at_risk_square(board)
   WINNING_LINES.each do |line|
     if board.values_at(*line) == [PLAYER_MARKER, PLAYER_MARKER, INITIAL_MARKER]
