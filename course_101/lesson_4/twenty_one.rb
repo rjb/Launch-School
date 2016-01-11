@@ -1,3 +1,4 @@
+require 'pry'
 SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"]
 RANKS = %w(1 2 3 4 5 6 7 8 9 Jack King Queen Ace)
 
@@ -13,13 +14,18 @@ def intialize_hands
   { player: [], dealer: [] }
 end
 
-def display(hands)
+def display(hands, hide_dealers_first = "down")
+  dealers_hand = hands[:dealer].map(&:join)
+  if hide_dealers_first == "down" && hands[:dealer].count <= 2 && hands[:dealer].count >= 1
+    dealers_hand[0] = "\u{1F0A0}" 
+  end
+
   sleep(1)
   system 'clear'
   puts "Welcome to Twenty-One!"
   puts "---"
-  puts "Player (#{total(hands[:player])}): #{hands[:player].map(&:join).join(' | ')}"
-  puts "Dealer (#{total(hands[:dealer])}): #{hands[:dealer].map(&:join).join(' | ')}"
+  puts "Player: #{hands[:player].map(&:join).join(' | ')}"
+  puts "Dealer: #{dealers_hand.join(' | ')}"
   puts "---"
 end
 
@@ -88,9 +94,18 @@ def game_over?(hands)
   bust?(hands[:player]) || bust?(hands[:dealer])
 end
 
+def flip(card)
+  if card == "down"
+    "up"
+  else
+    "down"
+  end
+end
+
 loop do
   deck = initialize_deck
   hands = intialize_hands
+  dealer_card = "down"
   display(hands)
 
   loop do
@@ -119,12 +134,15 @@ loop do
 
     break if game_over?(hands)
 
+    dealer_card = flip(dealer_card)
+    display(hands, dealer_card)
+
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealers turn..."
       
       deal_card(hands[:dealer], deck)
-      display(hands)
+      display(hands, dealer_card)
 
       if bust?(hands[:dealer])
         puts "Bust."
@@ -135,6 +153,7 @@ loop do
     break
   end
 
+  display(hands, dealer_card)
   display_winner(hands)
 
   prompt "Play again? (y or n)"
