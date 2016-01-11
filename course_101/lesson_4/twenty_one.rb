@@ -13,14 +13,14 @@ def intialize_hands
   { player: [], dealer: [] }
 end
 
-def display_hands(hands)
+def display(hands)
+  sleep(1)
   system 'clear'
   puts "Welcome to Twenty-One!"
   puts "---"
   puts "Player (#{total(hands[:player])}): #{hands[:player].map(&:join).join(' | ')}"
   puts "Dealer (#{total(hands[:dealer])}): #{hands[:dealer].map(&:join).join(' | ')}"
   puts "---"
-  sleep(1)
 end
 
 def deal_card(player, deck)
@@ -91,17 +91,17 @@ end
 loop do
   deck = initialize_deck
   hands = intialize_hands
-  display_hands(hands)
+  display(hands)
 
   loop do
     deal_card(hands[:player], deck)
-    display_hands(hands)
+    display(hands)
     deal_card(hands[:dealer], deck)
-    display_hands(hands)    
+    display(hands)    
     deal_card(hands[:player], deck)
-    display_hands(hands)
+    display(hands)
     deal_card(hands[:dealer], deck)
-    display_hands(hands)
+    display(hands)
 
     # Player
     loop do
@@ -109,7 +109,7 @@ loop do
       break unless gets.chomp.start_with?('h')
       
       deal_card(hands[:player], deck)
-      display_hands(hands)
+      display(hands)
 
       if bust?(hands[:player])
         puts "Bust."
@@ -124,7 +124,7 @@ loop do
       prompt "Dealers turn..."
       
       deal_card(hands[:dealer], deck)
-      display_hands(hands)
+      display(hands)
 
       if bust?(hands[:dealer])
         puts "Bust."
