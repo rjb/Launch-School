@@ -80,7 +80,7 @@ def display_winner(hands)
   if winner == "Draw"
     puts "Game is a draw."
   else
-    puts "#{winner} wins!"
+    puts "#{winner} wins."
   end
 end
 
@@ -112,7 +112,7 @@ loop do
       display_hands(hands)
 
       if bust?(hands[:player])
-        prompt "Bust."
+        puts "Bust."
         break
       end
     end
@@ -127,7 +127,7 @@ loop do
       display_hands(hands)
 
       if bust?(hands[:dealer])
-        prompt "Bust."
+        puts "Bust."
         break
       end
     end
