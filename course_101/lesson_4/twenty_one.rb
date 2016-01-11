@@ -61,31 +61,22 @@ def bust?(hand)
   total(hand) > 21
 end
 
-def determine_winner(hands)
+def display_winner(hands)
   player_total = total(hands[:player])
   dealer_total = total(hands[:dealer])
 
   if bust?(hands[:player]) && bust?(hands[:dealer])
-    "Draw"
+    puts "Draw."
   elsif bust?(hands[:player])
-    "Dealer"
+    puts "House wins."
   elsif bust?(hands[:dealer])
-    "Player"
+    puts "Player wins!"
   elsif player_total == dealer_total
-    "Draw"
+    puts "Draw."
   elsif player_total > dealer_total
-    "Player"
+    puts "Player wins!"
   elsif dealer_total > player_total
-    "Dealer"
-  end
-end
-
-def display_winner(hands)
-  winner = determine_winner(hands)
-  if winner == "Draw"
-    puts "Game is a draw."
-  else
-    puts "#{winner} wins."
+    puts "House wins!"
   end
 end
 
