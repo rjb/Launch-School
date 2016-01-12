@@ -48,7 +48,7 @@ def total(hand)
     end
   end
 
-  values.select { |value| value == 'A' }.count.times do
+  values.count('A').times do
     total -= 10 if total > 21
   end
 
