@@ -152,7 +152,6 @@ end
 
 def tally_score(winner, score)
   return score[winner.downcase.to_sym] += 1 if winner
-  nil
 end
 
 def game_over?(score)
