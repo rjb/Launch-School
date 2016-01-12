@@ -1,5 +1,5 @@
 SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"]
-RANKS = %w(1 2 3 4 5 6 7 8 9 Jack King Queen Ace)
+RANKS = %w(1 2 3 4 5 6 7 8 9 J K Q A)
 
 def prompt(message)
   puts "=> #{message}"
@@ -37,16 +37,16 @@ def total(hand)
   values = hand.map { |value| value[0] }
 
   values.each do |value|
-    if value == 'Ace'
+    if value == 'A'
       total += 11
-    elsif %w(Jack King Queen).include?(value)
+    elsif %w(J K Q).include?(value)
       total += 10
     else
       total += value.to_i
     end
   end
 
-  values.select { |value| value == 'Ace' }.count.times do
+  values.select { |value| value == 'A' }.count.times do
     total -= 10 if total > 21
   end
 
