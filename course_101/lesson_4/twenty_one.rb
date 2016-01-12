@@ -14,16 +14,18 @@ def intialize_hands
 end
 
 def display(hands, dealer_first_card = "down")
+  players_hand = hands[:player].map(&:join)
   dealers_hand = hands[:dealer].map(&:join)
-  if dealer_first_card == "down" && hands[:dealer].count <= 2 && hands[:dealer].count >= 1
-    dealers_hand[0] = "\u{1F0A0}" 
+
+  if dealer_first_card == "down" && !dealers_hand.empty?
+    dealers_hand[0] = "\u{1F0A0}"
   end
 
   sleep(1)
   system 'clear'
   puts "Welcome to Twenty-One!"
   puts "---"
-  puts "Player: #{hands[:player].map(&:join).join(' | ')}"
+  puts "Player: #{players_hand.join(' | ')}"
   puts "Dealer: #{dealers_hand.join(' | ')}"
   puts "---"
 end
@@ -57,7 +59,7 @@ def twenty_one?(hand)
   total(hand) == 21
 end
 
-def bust?(hand)
+def busted?(hand)
   total(hand) > 21
 end
 
@@ -65,23 +67,17 @@ def display_winner(hands)
   player_total = total(hands[:player])
   dealer_total = total(hands[:dealer])
 
-  if bust?(hands[:player]) && bust?(hands[:dealer])
+  if player_total == dealer_total
     puts "Draw."
-  elsif bust?(hands[:player])
+  elsif busted?(hands[:player])
     puts "House wins."
-  elsif bust?(hands[:dealer])
+  elsif busted?(hands[:dealer])
     puts "You win!"
-  elsif player_total == dealer_total
-    puts "Draw."
-  elsif player_total > dealer_total
+  elsif player_total < dealer_total
+    puts "House wins."
+  elsif dealer_total < player_total
     puts "You win!"
-  elsif dealer_total > player_total
-    puts "House wins!"
   end
-end
-
-def game_over?(hands)
-  bust?(hands[:player]) || bust?(hands[:dealer])
 end
 
 def flip(card)
@@ -103,7 +99,7 @@ loop do
   dealer_first_card = "down"
   display(hands)
 
-  loop do
+  1.times do
     # Deal
     4.times do
       deal_card(hands[current_player.to_sym], deck)
@@ -114,18 +110,18 @@ loop do
     # Player
     loop do
       prompt "Hit (h) or Stand (s)?"
-      break unless gets.chomp.start_with?('h')
-      
+      break if gets.chomp.start_with?('s')
+
       deal_card(hands[:player], deck)
       display(hands)
 
-      if bust?(hands[:player])
-        puts "Bust."
-        break
-      end
+      break if busted?(hands[:player])
     end
 
-    break if game_over?(hands)
+    if busted?(hands[:player])
+      puts "You busted."
+      break
+    end
 
     dealer_first_card = flip(dealer_first_card)
     display(hands, dealer_first_card)
@@ -133,22 +129,17 @@ loop do
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealers turn..."
-      
+
       deal_card(hands[:dealer], deck)
       display(hands, dealer_first_card)
-
-      if bust?(hands[:dealer])
-        puts "Bust."
-        break
-      end
     end
 
-    break
+    if busted?(hands[:dealer])
+      puts "Dealer busted."
+    end
   end
 
-  display(hands, dealer_first_card)
   display_winner(hands)
-
   prompt "Play again? (y or n)"
   break unless gets.chomp.start_with?('y')
 end
