@@ -97,28 +97,44 @@ def player_places_piece!(board)
 end
 
 def computer_places_piece!(board)
-  square = if square_at_risk?(board, COMPUTER_MARKER)
-             find_at_risk_square(board, COMPUTER_MARKER)
-           elsif square_at_risk?(board, PLAYER_MARKER)
-             find_at_risk_square(board, PLAYER_MARKER)
-           elsif middle_square_available?(board)
-             middle_square_position(board)
-           else
-             empty_squares(board).sample
-           end
+  square = nil
+
+  WINNING_LINES.each do |line|
+    if square_at_risk?(line, board, COMPUTER_MARKER)
+      square = find_at_risk_square(line, board, COMPUTER_MARKER)
+      break
+    end
+  end
+
+  unless square
+    WINNING_LINES.each do |line|
+      if square_at_risk?(line, board, PLAYER_MARKER)
+        square = find_at_risk_square(line, board, PLAYER_MARKER)
+        break
+      end
+    end
+  end
+
+  unless square
+    if middle_square_available?(board)
+      square = middle_square_position(board)
+    end
+  end
+
+  unless square
+    square = empty_squares(board).sample
+  end
 
   board[square] = COMPUTER_MARKER
 end
 
-def square_at_risk?(board, marker)
-  !!find_at_risk_square(board, marker)
+def square_at_risk?(line, board, marker)
+  !!find_at_risk_square(line, board, marker)
 end
 
-def find_at_risk_square(board, marker)
-  WINNING_LINES.each do |line|
-    if board.values_at(*line).count(marker) == 2
-      return line.find { |key| board[key] == INITIAL_MARKER }
-    end
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    return line.find { |key| board[key] == INITIAL_MARKER }
   end
   nil
 end
