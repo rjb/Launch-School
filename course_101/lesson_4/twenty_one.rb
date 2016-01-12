@@ -13,9 +13,9 @@ def intialize_hands
   { player: [], dealer: [] }
 end
 
-def display(hands, hide_dealers_first = "down")
+def display(hands, dealer_first_card = "down")
   dealers_hand = hands[:dealer].map(&:join)
-  if hide_dealers_first == "down" && hands[:dealer].count <= 2 && hands[:dealer].count >= 1
+  if dealer_first_card == "down" && hands[:dealer].count <= 2 && hands[:dealer].count >= 1
     dealers_hand[0] = "\u{1F0A0}" 
   end
 
@@ -99,8 +99,8 @@ end
 loop do
   deck = initialize_deck
   hands = intialize_hands
-  dealer_card = "down"
   current_player = "player"
+  dealer_first_card = "down"
   display(hands)
 
   loop do
@@ -127,15 +127,15 @@ loop do
 
     break if game_over?(hands)
 
-    dealer_card = flip(dealer_card)
-    display(hands, dealer_card)
+    dealer_first_card = flip(dealer_first_card)
+    display(hands, dealer_first_card)
 
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealers turn..."
       
       deal_card(hands[:dealer], deck)
-      display(hands, dealer_card)
+      display(hands, dealer_first_card)
 
       if bust?(hands[:dealer])
         puts "Bust."
@@ -146,7 +146,7 @@ loop do
     break
   end
 
-  display(hands, dealer_card)
+  display(hands, dealer_first_card)
   display_winner(hands)
 
   prompt "Play again? (y or n)"
