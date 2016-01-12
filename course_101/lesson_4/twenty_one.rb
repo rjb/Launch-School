@@ -92,21 +92,24 @@ def flip(card)
   end
 end
 
+def alternate(player)
+  player == "player" ? "dealer" : "player"
+end
+
 loop do
   deck = initialize_deck
   hands = intialize_hands
   dealer_card = "down"
+  current_player = "player"
   display(hands)
 
   loop do
-    deal_card(hands[:player], deck)
-    display(hands)
-    deal_card(hands[:dealer], deck)
-    display(hands)    
-    deal_card(hands[:player], deck)
-    display(hands)
-    deal_card(hands[:dealer], deck)
-    display(hands)
+    # Deal
+    4.times do
+      deal_card(hands[current_player.to_sym], deck)
+      display(hands)
+      current_player = alternate(current_player)
+    end
 
     # Player
     loop do
