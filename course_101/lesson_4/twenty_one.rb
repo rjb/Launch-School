@@ -70,11 +70,11 @@ def display_winner(hands)
   elsif bust?(hands[:player])
     puts "House wins."
   elsif bust?(hands[:dealer])
-    puts "Player wins!"
+    puts "You win!"
   elsif player_total == dealer_total
     puts "Draw."
   elsif player_total > dealer_total
-    puts "Player wins!"
+    puts "You win!"
   elsif dealer_total > player_total
     puts "House wins!"
   end
