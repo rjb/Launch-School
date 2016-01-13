@@ -160,6 +160,6 @@ loop do
   end
 
   display_winner(hands)
-  prompt "Clear the table <enter>"
-  gets
+  prompt "Clear the table <enter> or Exit (x)"
+  break if gets.chomp.start_with?('x')
 end
