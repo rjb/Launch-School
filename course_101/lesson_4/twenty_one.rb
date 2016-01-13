@@ -13,7 +13,7 @@ def intialize_hands
   { player: [], dealer: [] }
 end
 
-def display(hands, dealers_first_card = "down")
+def display_table(hands, dealers_first_card = "down")
   players_hand = hands[:player].map(&:join)
   dealers_hand = hands[:dealer].map(&:join)
 
@@ -97,13 +97,13 @@ loop do
   hands = intialize_hands
   current_player = "player"
   dealers_first_card = "down"
-  display(hands)
+  display_table(hands)
 
   1.times do
     # Deal
     4.times do
       deal_card(hands[current_player.to_sym], deck)
-      display(hands)
+      display_table(hands)
       current_player = alternate(current_player)
     end
 
@@ -113,7 +113,7 @@ loop do
       break if gets.chomp.start_with?('s')
 
       deal_card(hands[:player], deck)
-      display(hands)
+      display_table(hands)
 
       break if busted?(hands[:player])
     end
@@ -124,14 +124,14 @@ loop do
     end
 
     dealers_first_card = flip(dealers_first_card)
-    display(hands, dealers_first_card)
+    display_table(hands, dealers_first_card)
 
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealers turn..."
 
       deal_card(hands[:dealer], deck)
-      display(hands, dealers_first_card)
+      display_table(hands, dealers_first_card)
     end
 
     if busted?(hands[:dealer])
