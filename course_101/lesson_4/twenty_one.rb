@@ -1,3 +1,4 @@
+GAME_MESSAGE = "Welcome to Twenty-One!"
 SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"]
 RANKS = %w(1 2 3 4 5 6 7 8 9 J K Q A)
 
@@ -13,6 +14,13 @@ def intialize_hands
   { player: [], dealer: [] }
 end
 
+def display_new_game_message
+  system 'clear'
+  puts "#{GAME_MESSAGE}"
+  puts "Shuffling deck..."
+  sleep(2)
+end
+
 def display_table(hands, dealers_first_card = "down")
   players_hand = hands[:player].map(&:join)
   dealers_hand = hands[:dealer].map(&:join)
@@ -23,7 +31,7 @@ def display_table(hands, dealers_first_card = "down")
 
   sleep(0.5)
   system 'clear'
-  puts "Welcome to Twenty-One!"
+  puts "#{GAME_MESSAGE}"
   puts "---"
   puts "Player: #{players_hand.join(' | ')}"
   puts "Dealer: #{dealers_hand.join(' | ')}"
@@ -92,12 +100,19 @@ def alternate(player)
   player == "player" ? "dealer" : "player"
 end
 
+display_new_game_message
+
 loop do
   deck = initialize_deck
   hands = intialize_hands
+  
   current_player = "player"
   dealers_first_card = "down"
+  
   display_table(hands)
+
+  prompt "Deal (d) or Exit (x)"
+  break unless gets.chomp.start_with?('d')
 
   1.times do
     # Deal
@@ -145,6 +160,6 @@ loop do
   end
 
   display_winner(hands)
-  prompt "Deal (d) or Exit (x)"
-  break unless gets.chomp.start_with?('d')
+  prompt "Clear the table <enter>"
+  gets
 end
