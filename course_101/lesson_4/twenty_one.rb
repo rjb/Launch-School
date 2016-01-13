@@ -45,6 +45,22 @@ def display_table(hands, dealers_first_card = "down")
   sleep(0.5)
 end
 
+def display_results(hands)
+  player_total = total(hands[:player])
+  dealer_total = total(hands[:dealer])
+  if player_total == dealer_total
+    puts "Push."
+  elsif busted?(hands[:player])
+    puts "House wins."
+  elsif busted?(hands[:dealer])
+    puts "You win!"
+  elsif player_total < dealer_total
+    puts "House wins."
+  elsif dealer_total < player_total
+    puts "You win!"
+  end
+end
+
 def deal_card(player, deck)
   player << deck.shift
 end
@@ -76,23 +92,6 @@ end
 
 def busted?(hand)
   total(hand) > 21
-end
-
-def display_results(hands)
-  player_total = total(hands[:player])
-  dealer_total = total(hands[:dealer])
-
-  if player_total == dealer_total
-    puts "Push."
-  elsif busted?(hands[:player])
-    puts "House wins."
-  elsif busted?(hands[:dealer])
-    puts "You win!"
-  elsif player_total < dealer_total
-    puts "House wins."
-  elsif dealer_total < player_total
-    puts "You win!"
-  end
 end
 
 def flip(card)
