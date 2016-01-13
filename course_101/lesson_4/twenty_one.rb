@@ -114,7 +114,9 @@ loop do
   hands = intialize_hands
   current_player = "player"
   dealers_first_card = "down"
+
   display_table(hands)
+
   prompt "Deal (d) or Exit (x)"
   break unless gets.chomp.start_with?('d')
 
@@ -136,8 +138,10 @@ loop do
     loop do
       prompt "Hit (h) or Stand (s)?"
       break if gets.chomp.start_with?('s')
+
       deal_card(hands[:player], deck)
       display_table(hands)
+
       break if busted?(hands[:player])
     end
 
