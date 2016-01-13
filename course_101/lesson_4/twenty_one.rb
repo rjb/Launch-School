@@ -127,7 +127,7 @@ loop do
 
     if twenty_one?(hands[:player]) || twenty_one?(hands[:dealer])
       display_table(hands, true)
-      puts "Blackjack!"
+      puts "Twenty-One!"
       break
     end
 
