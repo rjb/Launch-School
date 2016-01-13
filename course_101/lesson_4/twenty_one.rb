@@ -108,8 +108,7 @@ loop do
     end
 
     if twenty_one?(hands[:player]) || twenty_one?(hands[:dealer])
-      dealers_first_card = flip(dealers_first_card)
-      display_table(hands, dealers_first_card)
+      display_table(hands, flip(dealers_first_card))
       puts "Blackjack!"
       break
     end
@@ -130,15 +129,14 @@ loop do
       break
     end
 
-    dealers_first_card = flip(dealers_first_card)
-    display_table(hands, dealers_first_card)
+    display_table(hands, flip(dealers_first_card))
 
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealers turn..."
 
       deal_card(hands[:dealer], deck)
-      display_table(hands, dealers_first_card)
+      display_table(hands, flip(dealers_first_card))
     end
 
     if busted?(hands[:dealer])
