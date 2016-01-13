@@ -1,6 +1,6 @@
 GAME_MESSAGE = "Welcome to Twenty-One!"
 SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"]
-RANKS = %w(1 2 3 4 5 6 7 8 9 J K Q A)
+RANKS = ('2'..'10').to_a + %w(J Q K A)
 
 def prompt(message)
   puts "=> #{message}"
