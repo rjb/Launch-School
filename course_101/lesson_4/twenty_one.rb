@@ -14,11 +14,18 @@ def intialize_hands
   { player: [], dealer: [] }
 end
 
-def display_new_game_message
-  system 'clear'
-  puts "#{GAME_MESSAGE}"
-  puts "Shuffling deck..."
-  sleep(2)
+def display_shuffling_deck
+  6.times do
+    deck1 = RANKS.product(SUITS).shuffle.pop(5)
+    deck2 = RANKS.product(SUITS).shuffle.pop(5)
+    system 'clear'
+    puts "#{GAME_MESSAGE}"
+    puts "----------------------"
+    puts "#{deck1.map(&:join).join(' | ')}"
+    puts "#{deck2.map(&:join).join(' | ')}"
+    puts "----------------------"
+    sleep(0.2)
+  end
 end
 
 def display_table(hands, dealers_first_card = "down")
@@ -29,13 +36,13 @@ def display_table(hands, dealers_first_card = "down")
     dealers_hand[0] = "\u{1F0A0}"
   end
 
-  sleep(0.5)
   system 'clear'
   puts "#{GAME_MESSAGE}"
-  puts "---"
+  puts "----------------------"
   puts "Player: #{players_hand.join(' | ')}"
   puts "Dealer: #{dealers_hand.join(' | ')}"
-  puts "---"
+  puts "----------------------"
+  sleep(0.5)
 end
 
 def deal_card(player, deck)
@@ -100,7 +107,7 @@ def alternate(player)
   player == "player" ? "dealer" : "player"
 end
 
-display_new_game_message
+display_shuffling_deck
 
 loop do
   deck = initialize_deck
@@ -160,6 +167,6 @@ loop do
   end
 
   display_winner(hands)
-  prompt "Clear the table <enter> or Exit (x)"
+  prompt "Clear table <enter> or Exit (x)"
   break if gets.chomp.start_with?('x')
 end
