@@ -78,7 +78,7 @@ def busted?(hand)
   total(hand) > 21
 end
 
-def display_winner(hands)
+def display_results(hands)
   player_total = total(hands[:player])
   dealer_total = total(hands[:dealer])
 
@@ -164,7 +164,7 @@ loop do
     end
   end
 
-  display_winner(hands)
+  display_results(hands)
   prompt "Clear table <enter> or Exit (x)"
   break if gets.chomp.start_with?('x')
 end
