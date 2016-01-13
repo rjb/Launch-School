@@ -68,7 +68,7 @@ def display_winner(hands)
   dealer_total = total(hands[:dealer])
 
   if player_total == dealer_total
-    puts "Draw."
+    puts "Push."
   elsif busted?(hands[:player])
     puts "House wins."
   elsif busted?(hands[:dealer])
@@ -140,6 +140,6 @@ loop do
   end
 
   display_winner(hands)
-  prompt "Play again? (y or n)"
-  break unless gets.chomp.start_with?('y')
+  prompt "Deal (d) or Exit (x)"
+  break unless gets.chomp.start_with?('d')
 end
