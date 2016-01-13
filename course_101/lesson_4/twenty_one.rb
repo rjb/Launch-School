@@ -15,9 +15,9 @@ def intialize_hands
 end
 
 def display_shuffling_deck
-  6.times do
-    deck1 = RANKS.product(SUITS).shuffle.pop(5)
-    deck2 = RANKS.product(SUITS).shuffle.pop(5)
+  12.times do
+    deck1 = initialize_deck[0..4]
+    deck2 = initialize_deck[0..4]
     system 'clear'
     puts "#{GAME_MESSAGE}"
     puts "----------------------"
@@ -112,12 +112,9 @@ display_shuffling_deck
 loop do
   deck = initialize_deck
   hands = intialize_hands
-  
   current_player = "player"
   dealers_first_card = "down"
-  
   display_table(hands)
-
   prompt "Deal (d) or Exit (x)"
   break unless gets.chomp.start_with?('d')
 
@@ -139,10 +136,8 @@ loop do
     loop do
       prompt "Hit (h) or Stand (s)?"
       break if gets.chomp.start_with?('s')
-
       deal_card(hands[:player], deck)
       display_table(hands)
-
       break if busted?(hands[:player])
     end
 
@@ -156,7 +151,6 @@ loop do
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealer's turn..."
-
       deal_card(hands[:dealer], deck)
       display_table(hands, flip(dealers_first_card))
     end
