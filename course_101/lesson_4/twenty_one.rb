@@ -28,19 +28,26 @@ def display_shuffling_deck
   end
 end
 
-def display_table(hands, dealers_first_card = "down")
-  players_hand = hands[:player].map(&:join)
-  dealers_hand = hands[:dealer].map(&:join)
+def display_players_hand(players_hand)
+  puts "Player: #{players_hand.map(&:join).join(' | ')}"
+end
 
-  if dealers_first_card == "down" && !dealers_hand.empty?
+def display_dealers_hand(dealers_hand, show_dealers_first_card = false)
+  dealers_hand = dealers_hand.map(&:join)
+
+  if !show_dealers_first_card && !dealers_hand.empty?
     dealers_hand[0] = "\u{1F0A0}"
   end
 
+  puts "Dealer: #{dealers_hand.join(' | ')}"
+end
+
+def display_table(hands, show_dealers_first_card = false)
   system 'clear'
   puts "#{GAME_MESSAGE}"
   puts "----------------------"
-  puts "Player: #{players_hand.join(' | ')}"
-  puts "Dealer: #{dealers_hand.join(' | ')}"
+  display_players_hand(hands[:player])
+  display_dealers_hand(hands[:dealer], show_dealers_first_card)
   puts "----------------------"
   sleep(0.5)
 end
@@ -94,14 +101,6 @@ def busted?(hand)
   total(hand) > 21
 end
 
-def flip(card)
-  if card == "down"
-    "up"
-  else
-    "down"
-  end
-end
-
 def alternate(player)
   player == "player" ? "dealer" : "player"
 end
@@ -112,7 +111,6 @@ loop do
   deck = initialize_deck
   hands = intialize_hands
   current_player = "player"
-  dealers_first_card = "down"
 
   display_table(hands)
 
@@ -128,7 +126,7 @@ loop do
     end
 
     if twenty_one?(hands[:player]) || twenty_one?(hands[:dealer])
-      display_table(hands, flip(dealers_first_card))
+      display_table(hands, true)
       puts "Blackjack!"
       break
     end
@@ -145,17 +143,18 @@ loop do
     end
 
     if busted?(hands[:player])
+      display_table(hands, true)
       puts "You busted."
       break
     end
 
-    display_table(hands, flip(dealers_first_card))
+    display_table(hands, true)
 
     # Dealer
     while total(hands[:dealer]) < 17
       prompt "Dealer's turn..."
       deal_card(hands[:dealer], deck)
-      display_table(hands, flip(dealers_first_card))
+      display_table(hands, true)
     end
 
     if busted?(hands[:dealer])
