@@ -150,7 +150,6 @@ loop do
 
     # Dealer
     while total(hands[:dealer]) < 17
-      prompt "Dealer's turn..."
       deal_card(hands[:dealer], deck)
       display_table(hands, true)
     end
