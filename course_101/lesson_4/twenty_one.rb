@@ -21,7 +21,7 @@ def display_table(hands, dealers_first_card = "down")
     dealers_hand[0] = "\u{1F0A0}"
   end
 
-  sleep(1)
+  sleep(0.5)
   system 'clear'
   puts "Welcome to Twenty-One!"
   puts "---"
@@ -133,7 +133,7 @@ loop do
 
     # Dealer
     while total(hands[:dealer]) < 17
-      prompt "Dealers turn..."
+      prompt "Dealer's turn..."
 
       deal_card(hands[:dealer], deck)
       display_table(hands, flip(dealers_first_card))
