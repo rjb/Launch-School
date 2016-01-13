@@ -107,6 +107,13 @@ loop do
       current_player = alternate(current_player)
     end
 
+    if twenty_one?(hands[:player]) || twenty_one?(hands[:dealer])
+      dealers_first_card = flip(dealers_first_card)
+      display_table(hands, dealers_first_card)
+      puts "Blackjack!"
+      break
+    end
+
     # Player
     loop do
       prompt "Hit (h) or Stand (s)?"
