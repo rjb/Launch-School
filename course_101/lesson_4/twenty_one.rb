@@ -16,13 +16,13 @@ end
 
 def display_shuffling_deck
   12.times do
-    deck1 = initialize_deck[0..4]
-    deck2 = initialize_deck[0..4]
+    deck1 = initialize_deck[0..4].map(&:join).join(' | ')
+    deck2 = initialize_deck[0..4].map(&:join).join(' | ')
     system 'clear'
     puts "#{GAME_MESSAGE}"
     puts "----------------------"
-    puts "#{deck1.map(&:join).join(' | ')}"
-    puts "#{deck2.map(&:join).join(' | ')}"
+    puts "#{deck1}"
+    puts "#{deck2}"
     puts "----------------------"
     sleep(0.2)
   end
