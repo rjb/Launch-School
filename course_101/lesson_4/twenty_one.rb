@@ -27,17 +27,19 @@ def display_shuffling_deck
 end
 
 def display_players_hand(players_hand)
-  puts "Player: #{players_hand.map(&:join).join(' | ')}"
+  puts "Player (#{total(players_hand)}): #{players_hand.map(&:join).join(' | ')}"
 end
 
 def display_dealers_hand(dealers_hand, show_dealers_first_card = false)
-  dealers_hand = dealers_hand.map(&:join)
+  dealers_hand = Array.new(dealers_hand)
+  total = total(dealers_hand)
 
   if !show_dealers_first_card && !dealers_hand.empty?
-    dealers_hand[0] = "\u{1F0A0}"
+    total -= total([dealers_hand.first])
+    dealers_hand[0] = ["\u{1F0A0}"]
   end
 
-  puts "Dealer: #{dealers_hand.join(' | ')}"
+  puts "Dealer (#{total}): #{dealers_hand.map(&:join).join(' | ')}"
 end
 
 def display_table(hands, show_dealers_first_card = false)
@@ -123,7 +125,7 @@ loop do
       current_player = alternate(current_player)
     end
 
-    if twenty_one?(hands[:player]) || twenty_one?(hands[:dealer])
+    if twenty_one?(hands[:player])
       display_table(hands, true)
       puts "Twenty-One!"
       break
