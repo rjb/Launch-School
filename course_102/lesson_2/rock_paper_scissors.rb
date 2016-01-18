@@ -193,11 +193,6 @@ class RPSGame
     answer == "f\n" ? true : false
   end
 
-  def set_scores
-    @human.set_score
-    @computer.set_score
-  end
-
   def new_hand
     loop do
       display_game_board
@@ -213,7 +208,8 @@ class RPSGame
 
   def new_game
     loop do
-      set_scores
+      @human.set_score
+      @computer.set_score
       new_hand
       display_game_winner
       break unless play_again?
