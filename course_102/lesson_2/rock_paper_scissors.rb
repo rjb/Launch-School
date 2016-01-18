@@ -145,7 +145,6 @@ class RPSGame
   end
 
   def display_game_board
-    system 'clear'
     display_welcome_message
     display_scores
   end
