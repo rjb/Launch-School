@@ -3,6 +3,9 @@ class Player
 
   def initialize
     set_name
+  end
+
+  def set_score
     self.score = Score.new
   end
 end
@@ -22,9 +25,9 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Please choose rock, paper, or scissors"
-      choice = gets.chomp
-      break if Move::VALUES.include?(choice)
+      puts "Choose rock (r), paper (p), or scissors (s)"
+      choice = gets.chomp.to_sym
+      break if Move::VALUES.keys.include?(choice)
       puts "Invalid choice!"
     end
     self.move = Move.new(choice)
@@ -37,31 +40,31 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    self.move = Move.new(Move::VALUES.keys.sample)
   end
 end
 
 class Move
-  VALUES = %w(rock paper scissors)
+  VALUES = { r: "rock", p: "paper", s: "scissors" }
 
   def initialize(value)
     @value = value
   end
 
   def rock?
-    @value == 'rock'
+    @value == :r
   end
 
   def paper?
-    @value == 'paper'
+    @value == :p
   end
 
   def scissors?
-    @value == 'scissors'
+    @value == :s
   end
 
   def to_s
-    @value
+    VALUES[@value]
   end
 
   def >(other)
@@ -82,10 +85,6 @@ class Score
   WINNING_SCORE = 10
 
   def initialize
-    @value = INITIAL_SCORE
-  end
-
-  def reset
     @value = INITIAL_SCORE
   end
 
@@ -130,9 +129,9 @@ class RPSGame
 
   def display_winner
     if human.move > computer.move
-      puts "#{human.name} wins!"
+      puts "#{human.name} won the hand!"
     elsif human.move < computer.move
-      puts "#{computer.name} wins."
+      puts "#{computer.name} won the hand."
     else
       puts "It's a draw."
     end
@@ -193,32 +192,36 @@ class RPSGame
     answer == "f\n" ? true : false
   end
 
-  def play
+  def set_scores
+    @human.set_score
+    @computer.set_score
+  end
+
+  def new_hand
     loop do
-      human.score.reset
-      computer.score.reset
+      display_game_board
+      @human.choose
+      @computer.choose
+      tally_points
+      display_game_board
+      display_moves
+      display_winner
+      break if game_over? || forfeit?
+    end
+  end
 
-      loop do
-        display_game_board
-        @human.choose
-        @computer.choose
-        tally_points
-        display_game_board
-        display_moves
-        display_winner
-
-        if game_over?
-          display_game_winner
-          break
-        end
-
-        break if forfeit?
-      end
-
+  def new_game
+    loop do
+      set_scores
+      new_hand
+      display_game_winner
       break unless play_again?
     end
-    
     display_goodbye_message
+  end
+
+  def play
+    new_game
   end
 end
 
