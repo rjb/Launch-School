@@ -101,6 +101,8 @@ class Score
 end
 
 class RPSGame
+  DIVIDER = "-" * 33
+
   attr_accessor :human, :computer
 
   def initialize
@@ -113,7 +115,7 @@ class RPSGame
     system 'clear'
     puts "Welcome to Rock, Paper, Scissors!"
     puts "First to #{Score::WINNING_SCORE} wins."
-    puts "---------------------------------"
+    puts DIVIDER
   end
 
   def display_goodbye_message
@@ -139,7 +141,7 @@ class RPSGame
   def display_scores
     puts "#{human.name}: #{human.score}"
     puts "#{computer.name}: #{computer.score}"
-    puts "---------------------------------"
+    puts DIVIDER
   end
 
   def display_game_board
