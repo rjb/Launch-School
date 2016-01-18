@@ -17,7 +17,6 @@ class Human < Player
       puts "What's your name?"
       n = gets.chomp
       break unless n.empty?
-      "Please enter your name"
     end
     self.name = n
   end
