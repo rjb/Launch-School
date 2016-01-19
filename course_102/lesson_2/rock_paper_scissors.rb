@@ -1,12 +1,17 @@
 class Player
-  attr_accessor :name, :move, :score
+  attr_accessor :name, :move, :history, :score
 
   def initialize
     set_name
+    @history = []
   end
 
   def set_score
     self.score = Score.new
+  end
+
+  def log_move
+    @history << "#{self.move}"
   end
 end
 
@@ -141,6 +146,11 @@ class RPSGame
     puts moves
   end
 
+  def display_move_history
+    puts "#{human.name} history: #{human.history}"
+    puts "#{computer.name} history: #{computer.history}"
+  end
+
   def display_winner
     if human.move > computer.move
       puts "#{human.name} won the hand!"
@@ -209,11 +219,14 @@ class RPSGame
     loop do
       display_game_board
       @human.choose
+      @human.log_move
       @computer.choose
+      @computer.log_move
       tally_points
       display_game_board
       display_moves
       display_winner
+      display_move_history
       break if game_over? || forfeit?
     end
   end
