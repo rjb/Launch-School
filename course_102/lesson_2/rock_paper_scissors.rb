@@ -11,7 +11,7 @@ class Player
   end
 
   def log_move
-    @history << "#{self.move}"
+    @history << "#{move}"
   end
 end
 
