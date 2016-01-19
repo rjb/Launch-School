@@ -24,7 +24,8 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Choose rock (r), paper (p), or scissors (s)"
+      choices = Move::VALUES.map { |accr, value| "#{value} (#{accr})" }.join(', ')
+      puts "Choose #{choices}"
       choice = gets.chomp.to_sym
       break if Move::VALUES.keys.include?(choice)
       puts "Invalid choice!"
@@ -44,7 +45,7 @@ class Computer < Player
 end
 
 class Move
-  VALUES = { r: "rock", p: "paper", s: "scissors" }
+  VALUES = { r: "rock", p: "paper", s: "scissors", l: "lizard", sp: "spock" }
 
   def initialize(value)
     @value = value
@@ -62,20 +63,32 @@ class Move
     @value == :s
   end
 
+  def lizard?
+    @value == :l
+  end
+
+  def spock?
+    @value == :sp
+  end
+
   def to_s
     VALUES[@value]
   end
 
   def >(other)
-    (rock? && other.scissors?) ||
-      (paper? && other.rock?) ||
-      (scissors? && other.paper?)
+    [rock?].product([other.scissors?, other.lizard?]).include?([true, true]) ||
+      [paper?].product([other.rock?, other.spock?]).include?([true, true]) ||
+      [scissors?].product([other.paper?, other.lizard?]).include?([true, true]) ||
+      [spock?].product([other.rock?, other.scissors?]).include?([true, true]) ||
+      [lizard?].product([other.paper?, other.spock?]).include?([true, true])
   end
 
   def <(other)
-    (rock? && other.paper?) ||
-      (paper? && other.scissors?) ||
-      (scissors? && other.rock?)
+    [rock?].product([other.paper?, other.spock?]).include?([true, true]) ||
+      [paper?].product([other.lizard?, other.scissors?]).include?([true, true]) ||
+      [scissors?].product([other.rock?, other.spock?]).include?([true, true]) ||
+      [spock?].product([other.lizard?, other.paper?]).include?([true, true]) ||
+      [lizard?].product([other.rock?, other.scissors?]).include?([true, true])
   end
 end
 
