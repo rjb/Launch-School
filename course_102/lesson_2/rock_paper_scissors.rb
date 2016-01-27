@@ -181,8 +181,8 @@ class RPSGame
   end
 
   def game_over?
-    "#{human.score}".to_i == Score::WINNING_SCORE ||
-      "#{computer.score}".to_i == Score::WINNING_SCORE
+    human.score == Score::WINNING_SCORE ||
+      computer.score == Score::WINNING_SCORE
   end
 
   def display_game_winner
