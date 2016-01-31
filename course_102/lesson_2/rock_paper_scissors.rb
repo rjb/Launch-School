@@ -29,7 +29,7 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      choices = Move::VALUES.map { |accr, value| "#{value} (#{accr})" }.join(', ')
+      choices = Move::VALUES.map { |abbr, value| "#{value} (#{abbr})" }.join(', ')
       puts "Choose #{choices}"
       choice = gets.chomp.to_sym
       break if Move::VALUES.keys.include?(choice)
