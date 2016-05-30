@@ -20,6 +20,10 @@ class GoodDog
   def info
     "#{name} weighs #{weight} and is #{height} tall."
   end
+
+  def self.what_am_i
+    "I'm a GoodDog class!"
+  end
 end
 
 sparky = GoodDog.new('Sparky', '12 inches', '5 lbs.')
