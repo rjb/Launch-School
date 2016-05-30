@@ -1,18 +1,29 @@
-module Speak
-  def speak(sound)
-    puts sound
+class GoodDog
+  attr_accessor :name, :height, :weight
+
+  def initialize(n, h, w)
+    @name = n
+    @height = h
+    @weight = w
+  end
+
+  def change_info(n, h, w)
+    self.name = n
+    self.height = h
+    self.weight = w
+  end
+
+  def speak
+    "#{name} says arf!"
+  end
+
+  def info
+    "#{name} weighs #{weight} and is #{height} tall."
   end
 end
 
-class GoodDog
-  include Speak
-end
+sparky = GoodDog.new('Sparky', '12 inches', '5 lbs.')
+puts sparky.info
 
-class Human
-  include Speak
-end
-
-sparky = GoodDog.new
-sparky.speak("Woof!")
-joe = Human.new
-joe.speak("Hiya!")
+sparky.change_info('Spot', '24 inches', '10 lbs.')
+puts sparky.info
