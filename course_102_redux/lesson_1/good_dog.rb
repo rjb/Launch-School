@@ -1,11 +1,15 @@
 class GoodDog
   @@number_of_dogs = 0
-  attr_accessor :name, :height, :weight
 
-  def initialize(n, h, w)
+  DOG_YEARS = 7
+
+  attr_accessor :name, :height, :weight, :age
+
+  def initialize(n, h, w, a=0)
     @name = n
     @height = h
     @weight = w
+    @age = a * DOG_YEARS
     @@number_of_dogs += 1
   end
 
@@ -47,3 +51,6 @@ sparky.change_info('Spot', '24 inches', '10 lbs.')
 puts jones.info
 
 puts GoodDog.total_number_of_dogs
+
+waffles = GoodDog.new('Waffles', '20 inches', '12 lbs.', 5)
+puts waffles.age
