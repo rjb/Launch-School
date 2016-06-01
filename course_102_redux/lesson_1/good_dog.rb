@@ -27,6 +27,10 @@ class GoodDog
     "#{name} weighs #{weight} and is #{height} tall."
   end
 
+  def to_s
+    "This dog's name is #{name} and it is #{age} in dog years."
+  end
+
   def self.what_am_i
     "I'm a GoodDog class!"
   end
@@ -54,3 +58,5 @@ puts GoodDog.total_number_of_dogs
 
 waffles = GoodDog.new('Waffles', '20 inches', '12 lbs.', 5)
 puts waffles.age
+
+puts waffles
