@@ -6,10 +6,10 @@ class GoodDog
   attr_accessor :name, :height, :weight, :age
 
   def initialize(n, h, w, a=0)
-    @name = n
-    @height = h
-    @weight = w
-    @age = a * DOG_YEARS
+    self.name = n
+    self.height = h
+    self.weight = w
+    self.age = a * DOG_YEARS
     @@number_of_dogs += 1
   end
 
