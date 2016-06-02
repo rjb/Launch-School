@@ -1,6 +1,6 @@
 class MyCar
   attr_accessor :color
-  attr_reader :year
+  attr_reader :year, :model
 
   def initialize(year, color, model)
     @year = year
@@ -29,6 +29,10 @@ class MyCar
     puts "Engine off"
   end
 
+  def to_s
+    "Year: #{self.year}; Mode: #{self.model}; Color: #{self.color}"
+  end
+
   def self.miles_per_gallon(distance, gallons)
     distance / gallons
   end
@@ -46,3 +50,5 @@ puts audi.color
 
 mpg = MyCar.miles_per_gallon(30, 2)
 puts "This car gets #{mpg} mpg"
+
+puts audi
