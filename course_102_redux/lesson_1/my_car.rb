@@ -28,6 +28,10 @@ class MyCar
   def shut_off
     puts "Engine off"
   end
+
+  def self.miles_per_gallon(distance, gallons)
+    distance / gallons
+  end
 end
 
 audi = MyCar.new(2005, 'gray', 'A4')
@@ -39,3 +43,6 @@ audi.current_speed
 
 audi.spray_paint('Black')
 puts audi.color
+
+mpg = MyCar.miles_per_gallon(30, 2)
+puts "This car gets #{mpg} mpg"
