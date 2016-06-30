@@ -21,9 +21,11 @@ end
 class Cat < Mammal
 end
 
+
 goldie = Fish.new
 sparky = Dog.new
 paws = Cat.new
+
 
 puts goldie.swim
 puts sparky.swim
