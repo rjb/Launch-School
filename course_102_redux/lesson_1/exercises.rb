@@ -46,8 +46,18 @@ class Vehicle
     distance / gallons
   end
 
+  def age
+    "The vehicle is #{calculate_age} year(s) old"
+  end
+
   def self.vehicle_count
     @@vehicle_count
+  end
+
+  private
+
+  def calculate_age
+    Time.now.year - self.year
   end
 end
 
@@ -79,3 +89,6 @@ puts MyCar::vehicle_count
 
 truck = MyTruck.new(2014, 'black', 'Toyota')
 p truck.can_carry_load?(500)
+
+p audi.age
+p truck.age
