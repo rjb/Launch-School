@@ -1,4 +1,10 @@
 class Vehicle
+  @@vehicle_count = 0
+
+  def initialize
+    @@vehicle_count += 1
+  end
+
   def speed_up
     @speed += 5
   end
@@ -22,6 +28,10 @@ class Vehicle
   def to_s
     "Year: #{self.year}; Mode: #{self.model}; Color: #{self.color}"
   end
+
+  def self.vehicle_count
+    @@vehicle_count
+  end
 end
 
 class MyCar < Vehicle
@@ -31,6 +41,7 @@ class MyCar < Vehicle
   CABIN_TYPE = "Passenger"
 
   def initialize(year, color, model)
+    super()
     @year = year
     @color = color
     @model = model
@@ -60,3 +71,4 @@ mpg = MyCar.miles_per_gallon(30, 2)
 puts "This car gets #{mpg} mpg"
 
 puts audi
+puts MyCar::vehicle_count
