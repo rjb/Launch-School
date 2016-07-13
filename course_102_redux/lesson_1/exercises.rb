@@ -90,5 +90,27 @@ puts MyCar::vehicle_count
 truck = MyTruck.new(2014, 'black', 'Toyota')
 p truck.can_carry_load?(500)
 
-p audi.age
-p truck.age
+puts audi.age
+puts truck.age
+
+class Student
+  def initialize(name, grade)
+    @name = name
+    @grade = grade
+  end
+
+  def better_grade_than?(student)
+    grade > student.grade
+  end
+
+  protected
+
+  def grade
+    @grade
+  end
+end
+
+joe = Student.new("Joe", 87)
+mary = Student.new("Mary", 92)
+
+p joe.better_grade_than?(mary)
