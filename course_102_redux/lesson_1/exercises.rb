@@ -83,3 +83,6 @@ puts MyCar::vehicle_count
 
 truck = MyTruck.new
 p truck.can_carry_load?(500)
+
+puts MyCar.ancestors
+puts MyTruck.ancestors
