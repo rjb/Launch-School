@@ -5,10 +5,17 @@ module Loadable
 end
 
 class Vehicle
+  attr_accessor :color
+  attr_reader :year, :model
+
   @@vehicle_count = 0
 
-  def initialize
+  def initialize(year, color, model)
     @@vehicle_count += 1
+    @year = year
+    @color = color
+    @model = model
+    @speed = 0
   end
 
   def speed_up
@@ -35,28 +42,17 @@ class Vehicle
     "Year: #{self.year}; Mode: #{self.model}; Color: #{self.color}"
   end
 
+  def self.miles_per_gallon(distance, gallons)
+    distance / gallons
+  end
+
   def self.vehicle_count
     @@vehicle_count
   end
 end
 
 class MyCar < Vehicle
-  attr_accessor :color
-  attr_reader :year, :model
-
   CABIN_TYPE = "Passenger"
-
-  def initialize(year, color, model)
-    super()
-    @year = year
-    @color = color
-    @model = model
-    @speed = 0
-  end
-
-  def self.miles_per_gallon(distance, gallons)
-    distance / gallons
-  end
 end
 
 class MyTruck < Vehicle
@@ -81,8 +77,5 @@ puts "This car gets #{mpg} mpg"
 puts audi
 puts MyCar::vehicle_count
 
-truck = MyTruck.new
+truck = MyTruck.new(2014, 'black', 'Toyota')
 p truck.can_carry_load?(500)
-
-puts MyCar.ancestors
-puts MyTruck.ancestors
