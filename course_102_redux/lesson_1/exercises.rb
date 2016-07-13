@@ -1,3 +1,9 @@
+module Loadable
+  def can_carry_load?(weight)
+    weight < 1000 ? true : false
+  end
+end
+
 class Vehicle
   @@vehicle_count = 0
 
@@ -54,6 +60,8 @@ class MyCar < Vehicle
 end
 
 class MyTruck < Vehicle
+  include Loadable
+
   CABIN_TYPE = "Truck"
 end
 
@@ -72,3 +80,6 @@ puts "This car gets #{mpg} mpg"
 
 puts audi
 puts MyCar::vehicle_count
+
+truck = MyTruck.new
+p truck.can_carry_load?(500)
