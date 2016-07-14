@@ -48,11 +48,11 @@ class Move
   end
 
   def rock?
-    
+    @value == 'rock'
   end
 
   def paper?
-    
+    @value == 'paper'
   end
 
   def scissors?
@@ -64,28 +64,26 @@ class Move
   end
 
   def >(other_move)
-    case @value
-    when 'rock'
+    if rock?
       return true if other_move.scissors?
       return false
-    when 'paper'
+    elsif paper?
       return true if other_move.rock?
       return false
-    when 'scissors'
+    elsif scissors?
       return true if other_move.paper?
       return false
     end
   end
 
   def <(other_move)
-    case @value
-    when rock?
+    if rock?
       return true if other_move.paper?
       return false
-    when paper?
+    elsif paper?
       return true if other_move.scissors?
       return false
-    when scissors?
+    elsif scissors?
       return true if other_move.rock?
       return false
     end
