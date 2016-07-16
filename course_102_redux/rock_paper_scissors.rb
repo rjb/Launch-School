@@ -65,27 +65,21 @@ class Move
 
   def >(other_move)
     if rock?
-      return true if other_move.scissors?
-      return false
+      other_move.scissors?
     elsif paper?
-      return true if other_move.rock?
-      return false
+      other_move.rock?
     elsif scissors?
-      return true if other_move.paper?
-      return false
+      other_move.paper?
     end
   end
 
   def <(other_move)
     if rock?
-      return true if other_move.paper?
-      return false
+      other_move.paper?
     elsif paper?
-      return true if other_move.scissors?
-      return false
+      other_move.scissors?
     elsif scissors?
-      return true if other_move.rock?
-      return false
+      other_move.rock?
     end
   end
 end
