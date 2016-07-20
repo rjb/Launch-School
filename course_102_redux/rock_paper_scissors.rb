@@ -101,14 +101,6 @@ class Score
   end
 end
 
-class Rule
-  def initialize
-  end
-end
-
-def compare(move1, move2)
-end
-
 class RPSGame
   DIVIDER = "-" * 38
 
