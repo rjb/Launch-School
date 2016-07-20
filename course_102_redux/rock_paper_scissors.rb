@@ -5,7 +5,7 @@ class Player
     set_name
   end
 
-  def set_score
+  def initialize_score
     self.score = Score.new
   end
 end
@@ -189,7 +189,7 @@ class RPSGame
   end
 
   def initialize_score
-    human.set_score && computer.set_score
+    human.initialize_score && computer.initialize_score
   end
 
   def new_hand
