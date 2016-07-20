@@ -1,8 +1,13 @@
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :score
 
   def initialize
     set_name
+    set_score
+  end
+
+  def set_score
+    self.score = Score.new
   end
 end
 
@@ -76,6 +81,22 @@ class Move
   end
 end
 
+class Score
+  INITIAL_SCORE = 0
+
+  def initialize
+    @value = INITIAL_SCORE
+  end
+
+  def add_point
+    @value += 1
+  end
+
+  def to_s
+    "#{@value}"
+  end
+end
+
 class Rule
   def initialize
   end
@@ -100,6 +121,14 @@ class RPSGame
     puts "Thanks for playing. Goodbye!"
   end
 
+  def award_winner
+    if human.move > computer.move
+      human.score.add_point
+    elsif human.move < computer.move
+      computer.score.add_point
+    end
+  end
+
   def display_winner
     puts "#{human.name} chose #{human.move}"
     puts "#{computer.name} chose #{computer.move}"
@@ -111,6 +140,10 @@ class RPSGame
     else
       puts "It's a tie."
     end
+
+    puts "Score:"
+    puts "Human: #{human.score}"
+    puts "Computer: #{computer.score}"
   end
 
   def play_again?
@@ -131,6 +164,7 @@ class RPSGame
     loop do
       human.choose
       computer.choose
+      award_winner
       display_winner
       break unless play_again?
     end
