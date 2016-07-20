@@ -10,8 +10,8 @@ class Player
     self.score = Score.new
   end
 
-  def log_move
-    self.moves << "#{move}"
+  def log_move(result)
+    self.moves << ["#{move}", result]
   end
 end
 
@@ -45,7 +45,23 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(Move::VALUES.sample)
+    choices = Move::VALUES.select do |item|
+      !losses.include?(item)
+    end
+    self.move = Move.new(choices.sample)
+  end
+
+  def losses
+    losses_weight.select { |k,v| v >= 0.6 }.keys
+  end
+
+  def losses_weight
+    result = {}
+    Move::VALUES.each do |value|
+      weight = moves.count { |move| move == [value, "lose"] } / moves.count.to_f
+      result[value] = weight.nan? ? 0 : weight
+    end
+    result
   end
 end
 
@@ -167,11 +183,39 @@ class RPSGame
   end
 
   def award_winner
-    if human.move > computer.move
+    if human_won?
       human.score.add_point
-    elsif human.move < computer.move
+    elsif computer_won?
       computer.score.add_point
     end
+  end
+
+  def human_result
+    if human_won?
+      "win"
+    elsif computer_won?
+      "lose"
+    else
+      "tie"
+    end
+  end
+
+  def computer_result
+    if computer_won?
+      "win"
+    elsif human_won?
+      "lose"
+    else
+      "tie"
+    end
+  end
+
+  def human_won?
+    human.move > computer.move
+  end
+
+  def computer_won?
+    computer.move > human.move
   end
 
   def game_over?
@@ -197,9 +241,9 @@ class RPSGame
   def new_hand
     loop do
       human.choose
-      human.log_move
       computer.choose
-      computer.log_move
+      human.log_move(human_result)
+      computer.log_move(computer_result)
       award_winner
       display_game_board
       break if game_over?
