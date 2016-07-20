@@ -110,6 +110,8 @@ def compare(move1, move2)
 end
 
 class RPSGame
+  DIVIDER = "-" * 38
+
   attr_accessor :human, :computer
 
   def initialize
@@ -117,33 +119,37 @@ class RPSGame
     @computer = Computer.new
   end
 
+  def display_game_board
+    display_welcome_message
+    display_moves
+    display_winner
+    display_score
+  end
+
   def display_welcome_message
     system 'clear'
-    puts "Welcome to RPSGame!"
+    puts DIVIDER
+    puts "Welcome to RPSGame! First to 10 wins."
+    puts DIVIDER
   end
 
   def display_goodbye_message
     puts "Thanks for playing. Goodbye!"
   end
 
-  def award_winner
-    if human.move > computer.move
-      human.score.add_point
-    elsif human.move < computer.move
-      computer.score.add_point
-    end
+  def display_score
+    puts DIVIDER
+    puts "#{human.name}: #{human.score} | " \
+           "#{computer.name}: #{computer.score}"
+    puts DIVIDER
   end
 
-  def display_score
-    puts "Score:"
-    puts "#{human.name}: #{human.score}"
-    puts "#{computer.name}: #{computer.score}"
+  def display_moves
+    puts "#{human.name} chose #{human.move}"
+    puts "#{computer.name} chose #{computer.move}"
   end
 
   def display_winner
-    puts "#{human.name} chose #{human.move}"
-    puts "#{computer.name} chose #{computer.move}"
-
     if human.move > computer.move
       puts "#{human.name} won!"
     elsif human.move < computer.move
@@ -161,20 +167,17 @@ class RPSGame
     end
   end
 
+  def award_winner
+    if human.move > computer.move
+      human.score.add_point
+    elsif human.move < computer.move
+      computer.score.add_point
+    end
+  end
+
   def game_over?
     human.score == Score::WINNING_SCORE ||
       computer.score == Score::WINNING_SCORE
-  end
-
-  def forfeit?
-    response = nil
-    loop do
-      puts "Forefeit the game? (y/n)"
-      response = gets.chomp
-      break if ['y', 'n'].include?(response)
-      puts "Invalid choice."
-    end
-    response == 'y' ? true : false
   end
 
   def play_again?
@@ -197,15 +200,14 @@ class RPSGame
       human.choose
       computer.choose
       award_winner
-      display_score
-      display_winner
-      break if game_over? # || forfeit?
+      display_game_board
+      break if game_over?
     end
   end
 
   def new_game
-    display_welcome_message
     loop do
+      display_welcome_message
       initialize_score
       new_hand
       display_game_winner
