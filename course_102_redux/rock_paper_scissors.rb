@@ -3,7 +3,6 @@ class Player
 
   def initialize
     set_name
-    set_score
   end
 
   def set_score
@@ -83,6 +82,7 @@ end
 
 class Score
   INITIAL_SCORE = 0
+  WINNING_SCORE = 10
 
   def initialize
     @value = INITIAL_SCORE
@@ -90,6 +90,10 @@ class Score
 
   def add_point
     @value += 1
+  end
+
+  def ==(value)
+    @value == value
   end
 
   def to_s
@@ -114,6 +118,7 @@ class RPSGame
   end
 
   def display_welcome_message
+    system 'clear'
     puts "Welcome to RPSGame!"
   end
 
@@ -129,6 +134,12 @@ class RPSGame
     end
   end
 
+  def display_score
+    puts "Score:"
+    puts "#{human.name}: #{human.score}"
+    puts "#{computer.name}: #{computer.score}"
+  end
+
   def display_winner
     puts "#{human.name} chose #{human.move}"
     puts "#{computer.name} chose #{computer.move}"
@@ -140,35 +151,71 @@ class RPSGame
     else
       puts "It's a tie."
     end
-
-    puts "Score:"
-    puts "Human: #{human.score}"
-    puts "Computer: #{computer.score}"
   end
 
-  def play_again?
-    response = nil
+  def display_game_winner
+    if human.score == Score::WINNING_SCORE
+      puts "#{human.name} won the game!"
+    elsif computer.score == Score::WINNING_SCORE
+      puts "#{computer.name} won the game!"
+    end
+  end
 
+  def game_over?
+    human.score == Score::WINNING_SCORE ||
+      computer.score == Score::WINNING_SCORE
+  end
+
+  def forfeit?
+    response = nil
     loop do
-      puts "Play again? (y/n)"
+      puts "Forefeit the game? (y/n)"
       response = gets.chomp
       break if ['y', 'n'].include?(response)
       puts "Invalid choice."
     end
-
     response == 'y' ? true : false
   end
 
-  def play
-    display_welcome_message
+  def play_again?
+    response = nil
+    loop do
+      puts "Play another game? (y/n)"
+      response = gets.chomp
+      break if ['y', 'n'].include?(response)
+      puts "Invalid choice."
+    end
+    response == 'y' ? true : false
+  end
+
+  def initialize_score
+    human.set_score && computer.set_score
+  end
+
+  def new_hand
     loop do
       human.choose
       computer.choose
       award_winner
+      display_score
       display_winner
+      break if game_over? # || forfeit?
+    end
+  end
+
+  def new_game
+    display_welcome_message
+    loop do
+      initialize_score
+      new_hand
+      display_game_winner
       break unless play_again?
     end
     display_goodbye_message
+  end
+
+  def play
+    new_game
   end
 end
 
