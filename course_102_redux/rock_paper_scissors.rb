@@ -1,12 +1,17 @@
 class Player
-  attr_accessor :move, :name, :score
+  attr_accessor :move, :moves, :name, :score
 
   def initialize
     set_name
+    @moves = []
   end
 
   def initialize_score
     self.score = Score.new
+  end
+
+  def log_move
+    self.moves << "#{move}"
   end
 end
 
@@ -116,6 +121,8 @@ class RPSGame
     display_moves
     display_winner
     display_score
+    puts "#{human.moves}"
+    puts "#{computer.moves}"
   end
 
   def display_welcome_message
@@ -190,7 +197,9 @@ class RPSGame
   def new_hand
     loop do
       human.choose
+      human.log_move
       computer.choose
+      computer.log_move
       award_winner
       display_game_board
       break if game_over?
