@@ -45,9 +45,7 @@ class Computer < Player
   end
 
   def choose
-    choices = Move::VALUES.select do |item|
-      !losses.include?(item)
-    end
+    choices = Move::VALUES.select { |item| !losses.include?(item) }
     self.move = Move.new(choices.sample)
   end
 
