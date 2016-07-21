@@ -1,4 +1,16 @@
 module Personality
+  def personality_choice(type)
+    if type == 'erratic'
+      erratic
+    elsif type == 'partial'
+      partial
+    elsif type == 'intelligent'
+      intelligent
+    end
+  end
+
+  private
+
   def intelligent
     # If 60% of choice results in loss, then doesn't pick that choice
     Move::VALUES.select { |item| !losses.include?(item) }.sample
@@ -17,8 +29,6 @@ module Personality
     end
     arr.sample
   end
-
-  private
 
   def losses
     losses_weight.select { |k,v| v >= 0.6 }.keys
@@ -92,14 +102,7 @@ class Computer < Player
   end
 
   def choose
-    choice = if COMPUTERS[self.name] == 'erratic'
-      erratic
-    elsif COMPUTERS[self.name] == 'partial'
-      partial
-    elsif COMPUTERS[self.name] == 'intelligent'
-      intelligent
-    end
-    self.move = Move.new(choice)
+    self.move = Move.new(personality_choice(COMPUTERS[self.name]))
   end
 end
 
