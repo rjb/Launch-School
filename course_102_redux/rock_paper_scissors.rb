@@ -1,3 +1,39 @@
+module Personality
+  def intelligent
+    # If 60% of choice results in loss, then doesn't pick that choice
+    Move::VALUES.select { |item| !losses.include?(item) }.sample
+  end
+
+  def erratic
+    # Random choice
+    Move::VALUES.sample
+  end
+
+  def partial
+    # Favors rock 60% of the time
+    arr = []
+    Move::ROCK_HEAVY.each do |item, weight|
+      weight.times { arr << item }
+    end
+    arr.sample
+  end
+
+  private
+
+  def losses
+    losses_weight.select { |k,v| v >= 0.6 }.keys
+  end
+
+  def losses_weight
+    result = {}
+    Move::VALUES.each do |value|
+      weight = self.moves.count { |move| move == [value, "lose"] } / self.moves.count.to_f
+      result[value] = weight.nan? ? 0 : weight
+    end
+    result
+  end
+end
+
 class Player
   attr_accessor :move, :moves, :name, :score
 
@@ -40,31 +76,36 @@ class Human < Player
 end
 
 class Computer < Player
+  include Personality
+
+  COMPUTERS = {
+    'HAL' => 'intelligent',
+    'C3PO' => 'erratic',
+    'Number5' => 'partial',
+    'GERTY' => 'intelligent',
+    'RobotB-9' => 'erratic',
+    'Rosie' => 'partial'
+  }
+
   def set_name
-    self.name = %w(HAL C3PO Number5 GERTY RobotB-9 Rosie).sample
+    self.name = COMPUTERS.keys.sample
   end
 
   def choose
-    choices = Move::VALUES.select { |item| !losses.include?(item) }
-    self.move = Move.new(choices.sample)
-  end
-
-  def losses
-    losses_weight.select { |k,v| v >= 0.6 }.keys
-  end
-
-  def losses_weight
-    result = {}
-    Move::VALUES.each do |value|
-      weight = moves.count { |move| move == [value, "lose"] } / moves.count.to_f
-      result[value] = weight.nan? ? 0 : weight
+    choice = if COMPUTERS[self.name] == 'erratic'
+      erratic
+    elsif COMPUTERS[self.name] == 'partial'
+      partial
+    elsif COMPUTERS[self.name] == 'intelligent'
+      intelligent
     end
-    result
+    self.move = Move.new(choice)
   end
 end
 
 class Move
   VALUES = ['rock', 'paper', 'scissors']
+  ROCK_HEAVY = {"rock" => 60, "paper" => 30, "scissors" => 10}
 
   def initialize(value)
     @value = value
