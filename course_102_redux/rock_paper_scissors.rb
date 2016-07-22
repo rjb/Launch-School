@@ -117,14 +117,8 @@ class Computer < Player
 end
 
 class Weapon
-  attr_reader :weight
-
   VALUES = ['rock', 'paper', 'scissors']
   ROCK_HEAVY = {"rock" => 60, "paper" => 30, "scissors" => 10}
-
-  def initialize(weight = 1)
-    @weight = weight
-  end
 end
 
 class Rock
