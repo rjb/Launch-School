@@ -100,7 +100,7 @@ class Computer < Player
 
   COMPUTERS = {
     'HAL' => 'intelligent',
-    'C3PO' => 'erratic',
+    'C-3PO' => 'erratic',
     'Number5' => 'partial',
     'GERTY' => 'intelligent',
     'RobotB-9' => 'erratic',
