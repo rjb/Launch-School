@@ -13,18 +13,18 @@ module Personality
 
   def intelligent
     # If 60% of choice results in loss, then doesn't pick that choice
-    Move::VALUES.select { |item| !losses.include?(item) }.sample
+    Weapon::VALUES.select { |item| !losses.include?(item) }.sample
   end
 
   def erratic
     # Random choice
-    Move::VALUES.sample
+    Weapon::VALUES.sample
   end
 
   def partial
     # Favors rock 60% of the time
     arr = []
-    Move::ROCK_HEAVY.each do |item, weight|
+    Weapon::ROCK_HEAVY.each do |item, weight|
       weight.times { arr << item }
     end
     arr.sample
@@ -36,7 +36,7 @@ module Personality
 
   def losses_weight
     result = {}
-    Move::VALUES.each do |value|
+    Weapon::VALUES.each do |value|
       weight = self.moves.count { |move| move == [value, "lose"] } / self.moves.count.to_f
       result[value] = weight.nan? ? 0 : weight
     end
@@ -88,7 +88,7 @@ class Human < Player
     loop do
       puts "Choose rock, paper, or scissors:"
       choice = gets.chomp
-      break if Move::VALUES.include?(choice)
+      break if Weapon::VALUES.include?(choice)
       puts "Invalid choice."
     end
     self.move = Move.new(set_weapon(choice))
@@ -118,6 +118,9 @@ end
 
 class Weapon
   attr_reader :weight
+
+  VALUES = ['rock', 'paper', 'scissors']
+  ROCK_HEAVY = {"rock" => 60, "paper" => 30, "scissors" => 10}
 
   def initialize(weight = 1)
     @weight = weight
@@ -156,9 +159,6 @@ end
 
 class Move
   attr_reader :value
-
-  VALUES = ['rock', 'paper', 'scissors']
-  ROCK_HEAVY = {"rock" => 60, "paper" => 30, "scissors" => 10}
 
   def initialize(value)
     @value = value
