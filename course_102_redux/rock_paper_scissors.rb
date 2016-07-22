@@ -106,40 +106,68 @@ class Computer < Player
   end
 end
 
+class Rock
+  def beats?(other_move)
+    other_move.value.class == Scissors
+  end
+
+  def loses_to?(other_move)
+    other_move.value.class == Paper
+  end
+end
+
+class Paper
+  def beats?(other_move)
+    other_move.value.class == Rock
+  end
+
+  def loses_to?(other_move)
+    other_move.value.class == Scissors
+  end
+end
+
+class Scissors
+  def beats?(other_move)
+    other_move.value.class == Paper
+  end
+
+  def loses_to?(other_move)
+    other_move.value.class == Scissors
+  end
+end
+
 class Move
+  attr_reader :value
+
   VALUES = ['rock', 'paper', 'scissors']
   ROCK_HEAVY = {"rock" => 60, "paper" => 30, "scissors" => 10}
 
   def initialize(value)
-    @value = value
-  end
-
-  def rock?
-    @value == 'rock'
-  end
-
-  def paper?
-    @value == 'paper'
-  end
-
-  def scissors?
-    @value == 'scissors'
-  end
-
-  def to_s
-    @value
+    @value = set_weapon(value)
   end
 
   def >(other_move)
-    (rock? && other_move.scissors?) ||
-      (paper? && other_move.rock?) ||
-      (scissors? && other_move.paper?)
+    @value.beats?(other_move)
   end
 
   def <(other_move)
-    (rock? && other_move.paper?) ||
-      (paper? && other_move.scissors?) ||
-      (scissors? && other_move.rock?)
+    @value.loses_to?(other_move)
+  end
+
+  def to_s
+    "#{@value.class}"
+  end
+
+  private
+
+  def set_weapon(value)
+    if value == 'rock'
+      Rock.new
+    elsif value == 'paper'
+      Paper.new
+    elsif value == 'scissors'
+      Scissors.new
+    end
   end
 end
 
