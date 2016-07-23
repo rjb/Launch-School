@@ -248,8 +248,6 @@ class RPSGame
     display_moves
     display_winner
     display_score
-    puts "#{human.moves}"
-    puts "#{computer.moves}"
   end
 
   def display_welcome_message
