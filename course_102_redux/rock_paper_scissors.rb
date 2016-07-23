@@ -63,6 +63,10 @@ class Player
       Paper.new
     elsif value == 'scissors'
       Scissors.new
+    elsif value == 'spock'
+      Spock.new
+    elsif value == 'lizard'
+      Lizard.new
     end
   end
 
@@ -86,7 +90,7 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Choose rock, paper, or scissors:"
+      puts "Choose #{Weapon.choices}:"
       choice = gets.chomp
       break if Weapon::VALUES.include?(choice)
       puts "Invalid choice."
@@ -117,37 +121,74 @@ class Computer < Player
 end
 
 class Weapon
-  VALUES = ['rock', 'paper', 'scissors']
-  ROCK_HEAVY = {"rock" => 60, "paper" => 30, "scissors" => 10}
+  VALUES = ['rock', 'paper', 'scissors', 'spock', 'lizard']
+  ROCK_HEAVY = {"rock" => 6, "paper" => 1, "scissors" => 1, "spock" => 1, "lizard" => 1,}
+
+  def self.choices
+    weapons = VALUES.map do |item|
+      item == VALUES.last ? "or #{item}" : item
+    end
+    weapons.join(', ')
+  end
 end
 
 class Rock
   def beats?(other_move)
-    other_move.value.class == Scissors
+    other_move.value.class == Scissors ||
+      other_move.value.class == Lizard
   end
 
   def loses_to?(other_move)
-    other_move.value.class == Paper
+    other_move.value.class == Paper ||
+      other_move.value.class == Spock
   end
 end
 
 class Paper
   def beats?(other_move)
-    other_move.value.class == Rock
+    other_move.value.class == Rock ||
+      other_move.value.class == Spock
   end
 
   def loses_to?(other_move)
-    other_move.value.class == Scissors
+    other_move.value.class == Scissors ||
+      other_move.value.class == Lizard
   end
 end
 
 class Scissors
   def beats?(other_move)
-    other_move.value.class == Paper
+    other_move.value.class == Paper ||
+      other_move.value.class == Lizard
   end
 
   def loses_to?(other_move)
-    other_move.value.class == Rock
+    other_move.value.class == Rock ||
+      other_move.value.class == Spock
+  end
+end
+
+class Spock
+  def beats?(other_move)
+    other_move.value.class == Rock ||
+      other_move.value.class == Scissors
+  end
+
+  def loses_to?(other_move)
+    other_move.value.class == Lizard ||
+      other_move.value.class == Paper
+  end
+end
+
+class Lizard
+  def beats?(other_move)
+    other_move.value.class == Paper ||
+      other_move.value.class == Spock
+  end
+
+  def loses_to?(other_move)
+    other_move.value.class == Rock ||
+      other_move.value.class == Scissors
   end
 end
 
