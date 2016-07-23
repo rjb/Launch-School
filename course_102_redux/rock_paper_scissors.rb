@@ -147,7 +147,7 @@ class Scissors
   end
 
   def loses_to?(other_move)
-    other_move.value.class == Scissors
+    other_move.value.class == Rock
   end
 end
 
