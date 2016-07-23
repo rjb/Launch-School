@@ -31,13 +31,13 @@ module Personality
   end
 
   def losses
-    losses_weight.select { |k,v| v >= 0.6 }.keys
+    losses_weight.select { |_, v| v >= 0.6 }.keys
   end
 
   def losses_weight
     result = {}
     Weapon::VALUES.each do |value|
-      weight = self.moves.count { |move| move == [value, "lose"] } / self.moves.count.to_f
+      weight = moves.count { |move| move == [value, "lose"] } / moves.count.to_f
       result[value] = weight.nan? ? 0 : weight
     end
     result
@@ -56,7 +56,7 @@ class Player
     self.score = Score.new
   end
 
-  def set_weapon(value)
+  def initialize_weapon(value)
     if value == 'rock'
       Rock.new
     elsif value == 'paper'
@@ -71,7 +71,7 @@ class Player
   end
 
   def log_move(result)
-    self.moves << ["#{move}", result]
+    moves << ["#{move}", result]
   end
 end
 
@@ -95,7 +95,7 @@ class Human < Player
       break if Weapon::VALUES.include?(choice)
       puts "Invalid choice."
     end
-    self.move = Move.new(set_weapon(choice))
+    self.move = Move.new(initialize_weapon(choice))
   end
 end
 
@@ -116,13 +116,20 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(set_weapon(personality_choice(COMPUTERS[self.name])))
+    self.move = Move.new(initialize_weapon(personality_choice(COMPUTERS[name])))
   end
 end
 
 class Weapon
   VALUES = ['rock', 'paper', 'scissors', 'spock', 'lizard']
-  ROCK_HEAVY = {"rock" => 6, "paper" => 1, "scissors" => 1, "spock" => 1, "lizard" => 1,}
+
+  ROCK_HEAVY = {
+    "rock" => 6,
+    "paper" => 1,
+    "scissors" => 1,
+    "spock" => 1,
+    "lizard" => 1
+  }
 
   def self.choices
     weapons = VALUES.map do |item|
