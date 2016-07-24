@@ -13,18 +13,18 @@ module Personality
 
   def intelligent
     # If 60% of choice results in loss, then doesn't pick that choice
-    Weapon::VALUES.select { |item| !losses_by_weight.include?(item) }.sample
+    Move::VALUES.select { |item| !losses_by_weight.include?(item) }.sample
   end
 
   def erratic
     # Random choice
-    Weapon::VALUES.sample
+    Move::VALUES.sample
   end
 
   def partial
     # Favors rock 60% of the time
     arr = []
-    Weapon::ROCK_HEAVY.each do |item, weight|
+    Move::ROCK_HEAVY.each do |item, weight|
       weight.times { arr << item }
     end
     arr.sample
@@ -36,7 +36,7 @@ module Personality
 
   def losses_weight
     result = {}
-    Weapon::VALUES.each do |value|
+    Move::VALUES.each do |value|
       weight = moves.count { |move| move == [value, "lose"] } / moves.count.to_f
       result[value] = weight.nan? ? 0 : weight
     end
@@ -80,9 +80,9 @@ class Human < Player
   def choose
     choice = nil
     loop do
-      puts "Choose #{Weapon.choices}:"
+      puts "Choose #{Move.choices}:"
       choice = gets.chomp
-      break if Weapon::VALUES.include?(choice)
+      break if Move::VALUES.include?(choice)
       puts "Invalid choice."
     end
     self.move = Move.new(choice)
@@ -107,25 +107,6 @@ class Computer < Player
 
   def choose
     self.move = Move.new(personality_choice(COMPUTERS[name]))
-  end
-end
-
-class Weapon
-  VALUES = ['rock', 'paper', 'scissors', 'spock', 'lizard']
-
-  ROCK_HEAVY = {
-    "rock" => 6,
-    "paper" => 1,
-    "scissors" => 1,
-    "spock" => 1,
-    "lizard" => 1
-  }
-
-  def self.choices
-    weapons = VALUES.map do |item|
-      item == VALUES.last ? "or #{item}" : item
-    end
-    weapons.join(', ')
   end
 end
 
@@ -165,6 +146,16 @@ class Lizard
 end
 
 class Move
+  VALUES = ['rock', 'paper', 'scissors', 'spock', 'lizard']
+
+  ROCK_HEAVY = {
+    "rock" => 6,
+    "paper" => 1,
+    "scissors" => 1,
+    "spock" => 1,
+    "lizard" => 1
+  }
+
   attr_reader :value
 
   def initialize(value)
@@ -181,6 +172,13 @@ class Move
 
   def to_s
     "#{@value.class}"
+  end
+
+  def self.choices
+    weapons = VALUES.map do |item|
+      item == VALUES.last ? "or #{item}" : item
+    end
+    weapons.join(', ')
   end
 
   def self.initialize_weapon(value)
