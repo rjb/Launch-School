@@ -56,20 +56,6 @@ class Player
     self.score = Score.new
   end
 
-  def initialize_weapon(value)
-    if value == 'rock'
-      Rock.new
-    elsif value == 'paper'
-      Paper.new
-    elsif value == 'scissors'
-      Scissors.new
-    elsif value == 'spock'
-      Spock.new
-    elsif value == 'lizard'
-      Lizard.new
-    end
-  end
-
   def log_move(result)
     moves << ["#{move}", result]
   end
@@ -99,7 +85,7 @@ class Human < Player
       break if Weapon::VALUES.include?(choice)
       puts "Invalid choice."
     end
-    self.move = Move.new(initialize_weapon(choice))
+    self.move = Move.new(choice)
   end
 end
 
@@ -120,7 +106,7 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(initialize_weapon(personality_choice(COMPUTERS[name])))
+    self.move = Move.new(personality_choice(COMPUTERS[name]))
   end
 end
 
@@ -182,7 +168,7 @@ class Move
   attr_reader :value
 
   def initialize(value)
-    @value = value
+    @value = Move.initialize_weapon(value)
   end
 
   def >(other_move)
@@ -195,6 +181,20 @@ class Move
 
   def to_s
     "#{@value.class}"
+  end
+
+  def self.initialize_weapon(value)
+    if value == 'rock'
+      Rock.new
+    elsif value == 'paper'
+      Paper.new
+    elsif value == 'scissors'
+      Scissors.new
+    elsif value == 'spock'
+      Spock.new
+    elsif value == 'lizard'
+      Lizard.new
+    end
   end
 end
 
