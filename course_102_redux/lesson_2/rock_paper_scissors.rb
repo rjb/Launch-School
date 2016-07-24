@@ -144,22 +144,12 @@ class Rock
     other_move.value.class == Scissors ||
       other_move.value.class == Lizard
   end
-
-  def loses_to?(other_move)
-    other_move.value.class == Paper ||
-      other_move.value.class == Spock
-  end
 end
 
 class Paper
   def beats?(other_move)
     other_move.value.class == Rock ||
       other_move.value.class == Spock
-  end
-
-  def loses_to?(other_move)
-    other_move.value.class == Scissors ||
-      other_move.value.class == Lizard
   end
 end
 
@@ -168,11 +158,6 @@ class Scissors
     other_move.value.class == Paper ||
       other_move.value.class == Lizard
   end
-
-  def loses_to?(other_move)
-    other_move.value.class == Rock ||
-      other_move.value.class == Spock
-  end
 end
 
 class Spock
@@ -180,22 +165,12 @@ class Spock
     other_move.value.class == Rock ||
       other_move.value.class == Scissors
   end
-
-  def loses_to?(other_move)
-    other_move.value.class == Lizard ||
-      other_move.value.class == Paper
-  end
 end
 
 class Lizard
   def beats?(other_move)
     other_move.value.class == Paper ||
       other_move.value.class == Spock
-  end
-
-  def loses_to?(other_move)
-    other_move.value.class == Rock ||
-      other_move.value.class == Scissors
   end
 end
 
@@ -211,7 +186,7 @@ class Move
   end
 
   def <(other_move)
-    @value.loses_to?(other_move)
+    !value.beats?(other_move)
   end
 
   def to_s
