@@ -347,7 +347,7 @@ class RPSGame
       break if ['y', 'n'].include?(response)
       puts "Invalid choice."
     end
-    response == 'y' ? true : false
+    response == 'y'
   end
 
   def initialize_score
