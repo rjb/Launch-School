@@ -13,7 +13,7 @@ module Personality
 
   def intelligent
     # If 60% of choice results in loss, then doesn't pick that choice
-    Weapon::VALUES.select { |item| !losses.include?(item) }.sample
+    Weapon::VALUES.select { |item| !losses_by_weight.include?(item) }.sample
   end
 
   def erratic
@@ -30,8 +30,8 @@ module Personality
     arr.sample
   end
 
-  def losses
-    losses_weight.select { |_, v| v >= 0.6 }.keys
+  def losses_by_weight(weight = 0.6)
+    losses_weight.select { |_, v| v >= weight }.keys
   end
 
   def losses_weight
