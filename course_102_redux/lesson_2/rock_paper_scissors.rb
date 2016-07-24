@@ -166,10 +166,6 @@ class Move
     @value.beats?(other_move)
   end
 
-  def <(other_move)
-    !value.beats?(other_move)
-  end
-
   def to_s
     "#{@value.class}"
   end
@@ -260,7 +256,7 @@ class RPSGame
   def display_winner
     if human.move > computer.move
       puts "#{human.name} won!"
-    elsif human.move < computer.move
+    elsif computer.move > computer.move
       puts "#{computer.name} won!"
     else
       puts "It's a tie."
