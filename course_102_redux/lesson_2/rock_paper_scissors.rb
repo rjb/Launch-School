@@ -1,10 +1,10 @@
 module Personality
-  def personality_choice(type)
-    if type == 'erratic'
+  def personality_choice
+    if Computer::COMPUTERS[name] == 'erratic'
       erratic
-    elsif type == 'partial'
+    elsif Computer::COMPUTERS[name] == 'partial'
       partial
-    elsif type == 'intelligent'
+    elsif Computer::COMPUTERS[name] == 'intelligent'
       intelligent
     end
   end
@@ -106,7 +106,7 @@ class Computer < Player
   end
 
   def choose
-    self.move = Move.new(personality_choice(COMPUTERS[name]))
+    self.move = Move.new(personality_choice)
   end
 end
 
