@@ -73,6 +73,10 @@ class Player
   def log_move(result)
     moves << ["#{move}", result]
   end
+
+  def give_point
+    score.add_point
+  end
 end
 
 class Human < Player
@@ -275,9 +279,9 @@ class RPSGame
 
   def award_winner
     if human_won?
-      human.score.add_point
+      human.give_point
     elsif computer_won?
-      computer.score.add_point
+      computer.give_point
     end
   end
 
