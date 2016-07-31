@@ -98,6 +98,10 @@ class TTTGame
     puts "Welcome to Tick Tack Toe!"
   end
 
+  def display_play_again_message
+    puts "Let's play again!"
+  end
+
   def display_goodbye_message
     puts "Thanks for playing!"
   end
@@ -163,6 +167,11 @@ class TTTGame
     answer == 'y'
   end
 
+  def reset
+    board.reset
+    clear
+  end
+
   def play
     clear
     display_welcome_message
@@ -182,8 +191,8 @@ class TTTGame
       clear
       display_result
       break unless play_again?
-      board.reset
-      clear
+      reset
+      display_play_again_message
     end
 
     display_goodbye_message
