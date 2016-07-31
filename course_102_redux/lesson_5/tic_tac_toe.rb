@@ -28,11 +28,19 @@ class Board
     !!detect_winner
   end
 
+  def count_human_marker(sqrs)
+    sqrs.count { |sqr| sqr.marker == TTTGame::HUMAN_MARKER }
+  end
+
+  def count_computer_marker(sqrs)
+    sqrs.count { |sqr| sqr.marker == TTTGame::COMPUTER_MARKER }
+  end
+
   def detect_winner
     WINNING_LINES.each do |line|
-      if @squares.values_at(*line).count { |square| square.marker == TTTGame::HUMAN_MARKER } == 3
+      if count_human_marker(@squares.values_at(*line)) == 3
         return TTTGame::HUMAN_MARKER
-      elsif @squares.values_at(*line).count { |square| square.marker == TTTGame::COMPUTER_MARKER } == 3
+      elsif count_computer_marker(@squares.values_at(*line)) == 3
         return TTTGame::COMPUTER_MARKER
       end
     end
