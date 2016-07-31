@@ -5,7 +5,7 @@ class Board
 
   def initialize
     @squares = {}
-    (1..9).each { |i| @squares[i] = Square.new }
+    reset
   end
 
   def get_square_at(key)
@@ -45,6 +45,10 @@ class Board
       end
     end
     nil
+  end
+
+  def reset
+    (1..9).each { |i| @squares[i] = Square.new }
   end
 end
 
@@ -94,8 +98,8 @@ class TTTGame
     puts "Thanks for playing!"
   end
 
-  def display_board
-    system 'clear'
+  def display_board(clear = true)
+    system 'clear' if clear
     puts "You're #{human.marker}. Computer is #{computer.marker}."
     puts ""
     puts "     |     |"
@@ -140,20 +144,39 @@ class TTTGame
     board.set_square_at(board.unmarked_keys.sample, computer.marker)
   end
 
+  def play_again?
+    answer = nil
+    loop do
+      puts "Would you like to play again? (y/n)"
+      answer = gets.chomp.downcase
+      break if %w(y n).include?(answer)
+      puts "Enter a valid choice."
+    end
+    answer == 'y'
+  end
+
   def play
+    system 'clear'
     display_welcome_message
-    display_board
 
     loop do
-      human_moves
-      break if board.someone_won? || board.full?
+      display_board(false)
 
-      computer_moves
-      break if board.someone_won? || board.full?
+      loop do
+        human_moves
+        break if board.someone_won? || board.full?
 
-      display_board
+        computer_moves
+        break if board.someone_won? || board.full?
+
+        display_board
+      end
+      display_result
+      break unless play_again?
+      board.reset
+      system 'clear'
     end
-    display_result
+
     display_goodbye_message
   end
 end
