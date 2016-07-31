@@ -1,26 +1,29 @@
+# Board
 class Board
-  WINNING_LINES = [ [1, 2, 3], [4, 5, 6], [7, 8, 9],
-                    [1, 4, 7], [2, 5, 8], [3, 6, 9],
-                    [1, 5, 9], [3, 5, 7] ]
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
+                   [1, 4, 7], [2, 5, 8], [3, 6, 9],
+                   [1, 5, 9], [3, 5, 7]]
 
   def initialize
     @squares = {}
     reset
   end
 
+  # rubocop:disable Metrics/AbcSize
   def draw
-    puts "     |     |"
+    puts '     |     |'
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
+    puts '     |     |'
+    puts '-----+-----+-----'
+    puts '     |     |'
     puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
-    puts "     |     |"
-    puts "-----+-----+-----"
-    puts "     |     |"
+    puts '     |     |'
+    puts '-----+-----+-----'
+    puts '     |     |'
     puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
-    puts "     |     |"
+    puts '     |     |'
   end
+  # rubocop:enable Metrics/AbcSize
 
   def []=(num, marker)
     @squares[num].marker = marker
@@ -41,9 +44,7 @@ class Board
   def winning_marker
     WINNING_LINES.each do |line|
       squares = @squares.values_at(*line)
-      if three_idential_markers?(squares)
-        return squares.first.marker
-      end
+      return squares.first.marker if three_idential_markers?(squares)
     end
     nil
   end
@@ -61,6 +62,7 @@ class Board
   end
 end
 
+# Player
 class Player
   attr_reader :marker
 
@@ -69,8 +71,9 @@ class Player
   end
 end
 
+# Square
 class Square
-  INITIAL_MARKER = " "
+  INITIAL_MARKER = ' '
 
   attr_accessor :marker
 
@@ -91,9 +94,10 @@ class Square
   end
 end
 
+# TTTGame
 class TTTGame
-  HUMAN_MARKER = "X"
-  COMPUTER_MARKER = "O"
+  HUMAN_MARKER = 'X'
+  COMPUTER_MARKER = 'O'
   FIRST_TO_MOVE = HUMAN_MARKER
 
   attr_reader :board, :human, :computer
@@ -131,7 +135,7 @@ class TTTGame
   end
 
   def display_welcome_message
-    puts "Welcome to Tick Tack Toe!"
+    puts 'Welcome to Tick Tack Toe!'
   end
 
   def display_play_again_message
@@ -139,14 +143,14 @@ class TTTGame
   end
 
   def display_goodbye_message
-    puts "Thanks for playing!"
+    puts 'Thanks for playing!'
   end
 
   def display_board
     puts "You're #{human.marker}. Computer is #{computer.marker}."
-    puts ""
+    puts ''
     board.draw
-    puts ""
+    puts ''
   end
 
   def clear_screen_and_display_board
@@ -159,9 +163,9 @@ class TTTGame
 
     case board.winning_marker
     when human.marker
-      puts "You won!"
+      puts 'You won!'
     when computer.marker
-      puts "Computer won!"
+      puts 'Computer won!'
     else
       puts "It's a tie."
     end
@@ -173,7 +177,7 @@ class TTTGame
     loop do
       square = gets.chomp.to_i
       break if board.unmarked_keys.include?(square)
-      puts "Please choose an unmarked square."
+      puts 'Please choose an unmarked square.'
     end
     board[square] = human.marker
   end
@@ -200,10 +204,10 @@ class TTTGame
   def play_again?
     answer = nil
     loop do
-      puts "Would you like to play again? (y/n)"
+      puts 'Would you like to play again? (y/n)'
       answer = gets.chomp.downcase
       break if %w(y n).include?(answer)
-      puts "Enter a valid choice."
+      puts 'Enter a valid choice.'
     end
     answer == 'y'
   end
