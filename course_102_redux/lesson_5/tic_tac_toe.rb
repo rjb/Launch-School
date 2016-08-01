@@ -62,15 +62,6 @@ class Board
   end
 end
 
-# Player
-class Player
-  attr_reader :marker
-
-  def initialize(marker)
-    @marker = marker
-  end
-end
-
 # Square
 class Square
   INITIAL_MARKER = ' '
@@ -91,6 +82,15 @@ class Square
 
   def unmarked?
     marker == INITIAL_MARKER
+  end
+end
+
+# Player
+class Player
+  attr_reader :marker
+
+  def initialize(marker)
+    @marker = marker
   end
 end
 
