@@ -171,8 +171,19 @@ class TTTGame
     end
   end
 
+  def choices_to_string
+    length = board.unmarked_keys.count
+    keys = board.unmarked_keys
+
+    if length == 1
+      "#{keys.first}"
+    else
+      "#{keys[0...-1].join(', ')}, or #{keys.last}"
+    end
+  end
+
   def human_moves
-    puts "Choose a square (#{board.unmarked_keys.join(', ')}): "
+    puts "Choose a square (#{choices_to_string}): "
     square = nil
     loop do
       square = gets.chomp.to_i
