@@ -87,10 +87,41 @@ end
 
 # Player
 class Player
-  attr_reader :marker
+  attr_reader :marker, :score
 
   def initialize(marker)
     @marker = marker
+    @score = Score.new
+  end
+
+  def give_point
+    @score.add_point
+  end
+
+  def reset_score
+    @score = Score.new
+  end
+end
+
+# Score
+class Score
+  INTIAL_SCORE = 0
+  WINNING_SCORE = 5
+
+  def initialize
+    @value = INTIAL_SCORE
+  end
+
+  def add_point
+    @value += 1
+  end
+
+  def ==(value)
+    @value == value
+  end
+
+  def to_s
+    "#{@value}"
   end
 end
 
@@ -110,8 +141,19 @@ class TTTGame
   end
 
   def play
-    clear
-    display_welcome_message
+    loop do
+      clear
+      display_welcome_message
+      new_game
+      display_match_result
+      break unless play_again?
+      reset
+      reset_score
+    end
+    display_goodbye_message
+  end
+
+  def new_game
     loop do
       display_board
       loop do
@@ -120,12 +162,11 @@ class TTTGame
         clear_screen_and_display_board if human_turn?
       end
       clear
+      award_point
       display_result
-      break unless play_again?
+      break if game_over? || forfeit?
       reset
-      display_play_again_message
     end
-    display_goodbye_message
   end
 
   private
@@ -135,11 +176,7 @@ class TTTGame
   end
 
   def display_welcome_message
-    puts 'Welcome to Tick Tack Toe!'
-  end
-
-  def display_play_again_message
-    puts "Let's play again!"
+    puts "Welcome to Tick Tack Toe! First to #{Score::WINNING_SCORE} wins."
   end
 
   def display_goodbye_message
@@ -148,6 +185,7 @@ class TTTGame
 
   def display_board
     puts "You're #{human.marker}. Computer is #{computer.marker}."
+    puts "You: #{human.score} Computer: #{computer.score}"
     puts ''
     board.draw
     puts ''
@@ -156,6 +194,15 @@ class TTTGame
   def clear_screen_and_display_board
     clear
     display_board
+  end
+
+  def award_point
+    case board.winning_marker
+    when human.marker
+      human.give_point
+    when computer.marker
+      computer.give_point
+    end
   end
 
   def display_result
@@ -168,6 +215,15 @@ class TTTGame
       puts 'Computer won!'
     else
       puts "It's a tie."
+    end
+  end
+
+  def display_match_result
+    case Score::WINNING_SCORE
+    when human.score
+      puts 'You won the match!'
+    when computer.score
+      puts 'Computer won the match!'
     end
   end
 
@@ -217,7 +273,7 @@ class TTTGame
   def play_again?
     answer = nil
     loop do
-      puts 'Would you like to play again? (y/n)'
+      puts 'Would you like to play another match? (y/n)'
       answer = gets.chomp.downcase
       break if %w(y n).include?(answer)
       puts 'Enter a valid choice.'
@@ -225,10 +281,30 @@ class TTTGame
     answer == 'y'
   end
 
+  def forfeit?
+    answer = nil
+    loop do
+      puts 'Continue (c) or forfeit (f)?'
+      answer = gets.chomp.downcase
+      break if %w(c f).include?(answer)
+      puts 'Enter a valid choice.'
+    end
+    answer == 'f'
+  end
+
+  def game_over?
+    human.score == Score::WINNING_SCORE ||
+      computer.score == Score::WINNING_SCORE
+  end
+
   def reset
     board.reset
     @current_marker = FIRST_TO_MOVE
     clear
+  end
+
+  def reset_score
+    human.reset_score && computer.reset_score
   end
 end
 
