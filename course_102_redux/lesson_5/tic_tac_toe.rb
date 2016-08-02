@@ -91,7 +91,6 @@ class Player
 
   def initialize(marker)
     @marker = marker
-    @score = Score.new
   end
 
   def give_point
@@ -142,13 +141,13 @@ class TTTGame
 
   def play
     loop do
+      reset
+      reset_score
       clear
       display_welcome_message
       new_game
       display_match_result
       break unless play_again?
-      reset
-      reset_score
     end
     display_goodbye_message
   end
