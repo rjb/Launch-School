@@ -1,5 +1,8 @@
+require 'pry'
 # Board
 class Board
+  attr_reader :squares
+
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
                    [1, 4, 7], [2, 5, 8], [3, 6, 9],
                    [1, 5, 9], [3, 5, 7]]
@@ -7,6 +10,10 @@ class Board
   def initialize
     @squares = {}
     reset
+  end
+
+  def reset
+    (1..9).each { |i| @squares[i] = Square.new }
   end
 
   # rubocop:disable Metrics/AbcSize
@@ -49,8 +56,16 @@ class Board
     nil
   end
 
-  def reset
-    (1..9).each { |i| @squares[i] = Square.new }
+  def at_risk_square(line, marker)
+    count = @squares.values_at(*line).count { |square| "#{square}" == marker }
+    if count == 2
+      square = @squares.select do |k, v|
+        line.include?(k) && "#{v}" == Square::INITIAL_MARKER 
+      end
+      square.keys.first
+    else
+      nil
+    end
   end
 
   private
@@ -251,7 +266,12 @@ class TTTGame
   end
 
   def computer_moves
-    square = board.unmarked_keys.sample
+    square = nil
+    Board::WINNING_LINES.each do |line|
+      square = board.at_risk_square(line, HUMAN_MARKER)
+      break if square
+    end
+    square = board.unmarked_keys.sample if !square
     board[square] = computer.marker
   end
 
