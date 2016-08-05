@@ -1,8 +1,6 @@
 require 'pry'
 # Board
 class Board
-  attr_reader :squares
-
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
                    [1, 4, 7], [2, 5, 8], [3, 6, 9],
                    [1, 5, 9], [3, 5, 7]]
@@ -56,16 +54,14 @@ class Board
     nil
   end
 
-  def at_risk_square(line, marker)
-    count = @squares.values_at(*line).count { |square| "#{square}" == marker }
-    if count == 2
-      square = @squares.select do |k, v|
-        line.include?(k) && "#{v}" == Square::INITIAL_MARKER 
+  def open_square(marker)
+    Board::WINNING_LINES.each do |line|
+      if @squares.values_at(*line).count { |sqr| "#{sqr}" == marker } == 2 &&
+           @squares.values_at(*line).count { |sqr| "#{sqr}" == Square::INITIAL_MARKER } == 1
+        return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
       end
-      square.keys.first
-    else
-      nil
     end
+    nil
   end
 
   private
@@ -266,12 +262,13 @@ class TTTGame
   end
 
   def computer_moves
-    square = nil
-    Board::WINNING_LINES.each do |line|
-      square = board.at_risk_square(line, HUMAN_MARKER)
-      break if square
-    end
-    square = board.unmarked_keys.sample if !square
+    square = if board.open_square(computer.marker)
+               board.open_square(computer.marker)
+             elsif board.open_square(human.marker)
+               board.open_square(human.marker)
+             else
+               board.unmarked_keys.sample
+             end
     board[square] = computer.marker
   end
 
