@@ -98,6 +98,7 @@ end
 
 # Player
 class Player
+  attr_accessor :name
   attr_reader :marker, :score
 
   def initialize(marker)
@@ -110,6 +111,34 @@ class Player
 
   def reset_score
     @score = Score.new
+  end
+end
+
+class Human < Player
+  def set_name
+    n = ""
+    loop do
+      puts "What is your name?"
+      n = gets.chomp
+      break unless n.empty?
+      puts "Invalid name."
+    end
+    self.name = n
+  end
+end
+
+class Computer < Player
+  NAMES = [
+    'HAL',
+    'C-3PO',
+    'Number5',
+    'GERTY',
+    'RobotB-9',
+    'Rosie'
+  ]
+
+  def set_name
+    self.name = NAMES.sample
   end
 end
 
@@ -145,12 +174,14 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
+    @human = Human.new(HUMAN_MARKER)
+    @computer = Computer.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
   end
 
   def play
+    human.set_name
+    computer.set_name
     loop do
       reset
       reset_score
@@ -194,8 +225,8 @@ class TTTGame
   end
 
   def display_board
-    puts "You're #{human.marker}. Computer is #{computer.marker}."
-    puts "You: #{human.score} Computer: #{computer.score}"
+    puts "#{human.name} (#{human.marker}): #{human.score} | " \
+           "#{computer.name} (#{computer.marker}): #{computer.score}"
     puts ''
     board.draw
     puts ''
