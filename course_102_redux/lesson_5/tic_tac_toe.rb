@@ -261,7 +261,7 @@ class TTTGame
   def set_human_marker
     m = ''
     loop do
-      puts "Pick a marker (#{MARKERS.join(' or ')}):"
+      puts "Pick a marker (#{choices_to_english(MARKERS)}):"
       m = gets.chomp.capitalize
       break unless m.empty? || !MARKERS.include?(m)
       puts 'Invalid marker.'
@@ -304,21 +304,20 @@ class TTTGame
     end
   end
 
-  def choices_string
-    length = board.unmarked_keys.count
-    keys = board.unmarked_keys
+  def choices_to_english(choices)
+    count = choices.count
 
-    if length == 1
-      "#{keys.first}"
-    elsif length == 2
-      "#{keys.join(' ')}"
+    if count == 1
+      "#{choices.first}"
+    elsif count == 2
+      "#{choices.join(' or ')}"
     else
-      "#{keys[0...-1].join(', ')}, or #{keys.last}"
+      "#{choices[0...-1].join(', ')}, or #{choices.last}"
     end
   end
 
   def human_moves
-    puts "Choose a square (#{choices_string}): "
+    puts "Choose a square (#{choices_to_english(board.unmarked_keys)}): "
     square = nil
     loop do
       square = gets.chomp.to_i
