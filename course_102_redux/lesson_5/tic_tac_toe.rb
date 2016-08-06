@@ -60,11 +60,19 @@ class Board
 
   def open_square(marker)
     Board::WINNING_LINES.each do |line|
-      if @squares.values_at(*line).count { |sqr| "#{sqr}" == marker } == 2 &&
-           @squares.values_at(*line).count { |sqr| "#{sqr}" == Square::INITIAL_MARKER } == 1
+      marker_count = @squares.values_at(*line).count do |sqr|
+        "#{sqr}" == marker
+      end
+
+      open_count = @squares.values_at(*line).count do |sqr|
+        "#{sqr}" == Square::INITIAL_MARKER
+      end
+
+      if marker_count == 2 && open_count == 1
         return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
       end
     end
+
     nil
   end
 
