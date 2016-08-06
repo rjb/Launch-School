@@ -54,6 +54,10 @@ class Board
     nil
   end
 
+  def win_opportunity?(marker)
+    open_square(marker)
+  end
+
   def open_square(marker)
     Board::WINNING_LINES.each do |line|
       if @squares.values_at(*line).count { |sqr| "#{sqr}" == marker } == 2 &&
@@ -98,12 +102,8 @@ end
 
 # Player
 class Player
-  attr_accessor :name
-  attr_reader :marker, :score
-
-  def initialize(marker)
-    @marker = marker
-  end
+  attr_accessor :name, :marker
+  attr_reader :score
 
   def give_point
     @score.add_point
@@ -111,19 +111,6 @@ class Player
 
   def reset_score
     @score = Score.new
-  end
-end
-
-class Human < Player
-  def set_name
-    n = ""
-    loop do
-      puts "What is your name?"
-      n = gets.chomp
-      break unless n.empty?
-      puts "Invalid name."
-    end
-    self.name = n
   end
 end
 
@@ -166,22 +153,64 @@ end
 
 # TTTGame
 class TTTGame
-  HUMAN_MARKER = 'X'
-  COMPUTER_MARKER = 'O'
-  FIRST_TO_MOVE = HUMAN_MARKER
+  MARKERS = %w(X O)
 
   attr_reader :board, :human, :computer
 
   def initialize
     @board = Board.new
-    @human = Human.new(HUMAN_MARKER)
-    @computer = Computer.new(COMPUTER_MARKER)
-    @current_marker = FIRST_TO_MOVE
+    @human = Player.new
+    @computer = Computer.new
+    set_names
+    set_markers
+    set_current_marker
+  end
+
+  def set_current_marker
+    @current_marker = human.marker
+  end
+
+  def set_markers
+    set_human_marker
+    set_computer_marker
+  end
+
+  def set_human_marker
+    m = ""
+    loop do
+      puts "Pick a marker (#{MARKERS.join(' or ')}):"
+      m = gets.chomp.capitalize
+      break unless m.empty? || !MARKERS.include?(m)
+      puts "Invalid marker."
+    end
+    human.marker = m
+  end
+
+  def set_computer_marker
+    computer.marker = MARKERS.select { |m| m != "#{human.marker}" }.sample
+  end
+
+  def set_names
+    set_human_name
+    set_computer_name
+  end
+
+  def set_human_name
+    n = ""
+    loop do
+      puts "What is your name?"
+      n = gets.chomp
+      break unless n.empty?
+      puts "Invalid name."
+    end
+    human.name = n
+  end
+
+  def set_computer_name
+    computer.set_name
   end
 
   def play
-    human.set_name
-    computer.set_name
     loop do
       reset
       reset_score
@@ -197,16 +226,20 @@ class TTTGame
   def new_game
     loop do
       display_board
-      loop do
-        current_player_moves
-        break if board.someone_won? || board.full?
-        clear_screen_and_display_board if human_turn?
-      end
+      alternate_moves
       clear
       award_point
       display_result
       break if game_over? || forfeit?
       reset
+    end
+  end
+
+  def alternate_moves
+    loop do
+      current_player_moves
+      break if board.someone_won? || board.full?
+      clear_screen_and_display_board if human_turn?
     end
   end
 
@@ -293,9 +326,9 @@ class TTTGame
   end
 
   def computer_moves
-    square = if board.open_square(computer.marker)
+    square = if board.win_opportunity?(computer.marker)
                board.open_square(computer.marker)
-             elsif board.open_square(human.marker)
+             elsif board.win_opportunity?(human.marker)
                board.open_square(human.marker)
              else
                board.unmarked_keys.sample
@@ -306,15 +339,15 @@ class TTTGame
   def current_player_moves
     if human_turn?
       human_moves
-      @current_marker = COMPUTER_MARKER
+      @current_marker = computer.marker
     else
       computer_moves
-      @current_marker = HUMAN_MARKER
+      @current_marker = human.marker
     end
   end
 
   def human_turn?
-    @current_marker == HUMAN_MARKER
+    @current_marker == human.marker
   end
 
   def play_again?
@@ -346,7 +379,7 @@ class TTTGame
 
   def reset
     board.reset
-    @current_marker = FIRST_TO_MOVE
+    @current_marker = human.marker
     clear
   end
 
