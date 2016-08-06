@@ -113,6 +113,21 @@ class Player
   attr_accessor :name, :marker
   attr_reader :score
 
+  def initialize
+    set_name
+  end
+
+  def set_name
+    n = ''
+    loop do
+      puts 'What is your name?'
+      n = gets.chomp
+      break unless n.empty?
+      puts 'Invalid name.'
+    end
+    self.name = n
+  end
+
   def give_point
     @score.add_point
   end
@@ -122,6 +137,7 @@ class Player
   end
 end
 
+# Computer
 class Computer < Player
   NAMES = [
     'HAL',
@@ -150,8 +166,8 @@ class Score
     @value += 1
   end
 
-  def ==(value)
-    @value == value
+  def ==(other)
+    @value == other
   end
 
   def to_s
@@ -169,53 +185,8 @@ class TTTGame
     @board = Board.new
     @human = Player.new
     @computer = Computer.new
-    set_names
     set_markers
     set_current_marker
-  end
-
-  def set_current_marker
-    @current_marker = human.marker
-  end
-
-  def set_markers
-    set_human_marker
-    set_computer_marker
-  end
-
-  def set_human_marker
-    m = ""
-    loop do
-      puts "Pick a marker (#{MARKERS.join(' or ')}):"
-      m = gets.chomp.capitalize
-      break unless m.empty? || !MARKERS.include?(m)
-      puts "Invalid marker."
-    end
-    human.marker = m
-  end
-
-  def set_computer_marker
-    computer.marker = MARKERS.select { |m| m != "#{human.marker}" }.sample
-  end
-
-  def set_names
-    set_human_name
-    set_computer_name
-  end
-
-  def set_human_name
-    n = ""
-    loop do
-      puts "What is your name?"
-      n = gets.chomp
-      break unless n.empty?
-      puts "Invalid name."
-    end
-    human.name = n
-  end
-
-  def set_computer_name
-    computer.set_name
   end
 
   def play
@@ -276,6 +247,30 @@ class TTTGame
   def clear_screen_and_display_board
     clear
     display_board
+  end
+
+  def set_current_marker
+    @current_marker = human.marker
+  end
+
+  def set_markers
+    set_human_marker
+    set_computer_marker
+  end
+
+  def set_human_marker
+    m = ''
+    loop do
+      puts "Pick a marker (#{MARKERS.join(' or ')}):"
+      m = gets.chomp.capitalize
+      break unless m.empty? || !MARKERS.include?(m)
+      puts 'Invalid marker.'
+    end
+    human.marker = m
+  end
+
+  def set_computer_marker
+    computer.marker = MARKERS.select { |m| m != "#{human.marker}" }.sample
   end
 
   def award_point
