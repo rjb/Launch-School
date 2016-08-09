@@ -48,8 +48,8 @@ class Board
 
   def winning_marker
     WINNING_LINES.each do |line|
-      squares = @squares.values_at(*line)
-      return squares.first.marker if three_idential_markers?(squares)
+      sqrs = @squares.values_at(*line)
+      return sqrs.first.marker if three_idential_markers?(sqrs)
     end
     nil
   end
