@@ -185,6 +185,8 @@ end
 
 # TTTGame
 class TTTGame
+  # Options: player, computer, choose
+  FIRST_PLAYER = 'choose'
   MARKERS = %w(X O)
 
   attr_reader :board, :human, :computer
@@ -194,7 +196,6 @@ class TTTGame
     @human = Player.new
     @computer = Computer.new
     set_markers
-    set_current_marker
   end
 
   def play
@@ -202,7 +203,6 @@ class TTTGame
       reset
       reset_score
       clear
-      display_welcome_message
       new_game
       display_match_result
       break unless play_again?
@@ -212,6 +212,7 @@ class TTTGame
 
   def new_game
     loop do
+      set_first_player_name
       display_board
       alternate_moves
       clear
@@ -232,11 +233,17 @@ class TTTGame
     puts "Welcome to Tick Tack Toe! First to #{Score::WINNING_SCORE} wins."
   end
 
+  def display_first_player_message
+    puts "#{@first_player_name} goes first"
+  end
+
   def display_goodbye_message
     puts 'Thanks for playing!'
   end
 
   def display_board
+    display_welcome_message
+    display_first_player_message
     puts "#{human.name} (#{human.marker}): #{human.score} | " \
            "#{computer.name} (#{computer.marker}): #{computer.score}"
     puts ''
@@ -258,7 +265,36 @@ class TTTGame
   end
 
   def set_current_marker
-    @current_marker = human.marker
+    @current_marker =
+      case FIRST_PLAYER
+      when 'player'
+        human.marker
+      when 'computer'
+        computer.marker
+      when 'choose'
+        choose_marker
+      end
+  end
+
+  def set_first_player_name
+    @first_player_name =
+      case @current_marker
+      when human.marker
+        human.name
+      when computer.marker
+        computer.name
+      end
+  end
+
+  def choose_marker
+    m = ''
+    loop do
+      puts "Who goes first, Player (p) or Computer (c)?"
+      m = gets.chomp.downcase
+      break if ['p', 'c'].include?(m)
+      puts 'Invalide choice.'
+    end
+    m == 'p' ? human.marker : computer.marker
   end
 
   def set_markers
@@ -391,7 +427,7 @@ class TTTGame
 
   def reset
     board.reset
-    @current_marker = human.marker
+    set_current_marker
     clear
   end
 
