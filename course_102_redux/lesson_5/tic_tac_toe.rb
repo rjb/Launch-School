@@ -54,8 +54,16 @@ class Board
     nil
   end
 
+  def middle_square_open?
+    "#{@squares[middle_square]}" == Square::INITIAL_MARKER
+  end
+
   def win_opportunity?(marker)
     open_square(marker)
+  end
+
+  def middle_square
+    (@squares.length / 2) + 1
   end
 
   def open_square(marker)
@@ -332,6 +340,8 @@ class TTTGame
                board.open_square(computer.marker)
              elsif board.win_opportunity?(human.marker)
                board.open_square(human.marker)
+             elsif board.middle_square_open?
+               board.middle_square
              else
                board.unmarked_keys.sample
              end
