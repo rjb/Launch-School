@@ -214,14 +214,6 @@ class TTTGame
     end
   end
 
-  def alternate_moves
-    loop do
-      current_player_moves
-      break if board.someone_won? || board.full?
-      clear_screen_and_display_board if human_turn?
-    end
-  end
-
   private
 
   def clear
@@ -247,6 +239,14 @@ class TTTGame
   def clear_screen_and_display_board
     clear
     display_board
+  end
+
+  def alternate_moves
+    loop do
+      current_player_moves
+      break if board.someone_won? || board.full?
+      clear_screen_and_display_board if human_turn?
+    end
   end
 
   def set_current_marker
