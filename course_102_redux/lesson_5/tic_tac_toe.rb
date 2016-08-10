@@ -1,14 +1,46 @@
 require 'pry'
+
 # Board
 class Board
-  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
-                   [1, 4, 7], [2, 5, 8], [3, 6, 9],
-                   [1, 5, 9], [3, 5, 7]]
-
   def initialize
     @squares = {}
     reset
   end
+
+  def someone_won?
+    !!winning_marker
+  end
+
+  def []=(num, marker)
+    @squares[num].marker = marker
+  end
+
+  def unmarked_keys
+    @squares.select { |_, square| square.unmarked? }.keys
+  end
+
+  def full?
+    unmarked_keys.empty?
+  end
+
+  def middle_square_open?
+    "#{@squares[middle_square]}" == Square::INITIAL_MARKER
+  end
+
+  def win_opportunity?(marker)
+    open_square(marker)
+  end
+
+  def middle_square
+    (@squares.length / 2) + 1
+  end
+end
+
+# 3x3 board
+class ThreeByThreeBoard < Board
+  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
+                   [1, 4, 7], [2, 5, 8], [3, 6, 9],
+                   [1, 5, 9], [3, 5, 7]]
 
   def reset
     (1..9).each { |i| @squares[i] = Square.new }
@@ -30,22 +62,6 @@ class Board
   end
   # rubocop:enable Metrics/AbcSize
 
-  def []=(num, marker)
-    @squares[num].marker = marker
-  end
-
-  def unmarked_keys
-    @squares.select { |_, square| square.unmarked? }.keys
-  end
-
-  def full?
-    unmarked_keys.empty?
-  end
-
-  def someone_won?
-    !!winning_marker
-  end
-
   def winning_marker
     WINNING_LINES.each do |line|
       sqrs = @squares.values_at(*line)
@@ -54,20 +70,8 @@ class Board
     nil
   end
 
-  def middle_square_open?
-    "#{@squares[middle_square]}" == Square::INITIAL_MARKER
-  end
-
-  def win_opportunity?(marker)
-    open_square(marker)
-  end
-
-  def middle_square
-    (@squares.length / 2) + 1
-  end
-
   def open_square(marker)
-    Board::WINNING_LINES.each do |line|
+    WINNING_LINES.each do |line|
       marker_count = @squares.values_at(*line).count do |sqr|
         "#{sqr}" == marker
       end
@@ -90,6 +94,86 @@ class Board
     markers = squares.select(&:marked?).collect(&:marker)
     return false if markers.count != 3
     markers.min == markers.max
+  end
+end
+
+# 5x5 board
+class FiveByFiveBoard < Board
+  WINNING_LINES = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15],
+                   [16, 17, 18, 19, 20], [21, 22, 23, 24, 25], [1, 6, 11, 16, 21],
+                   [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
+                   [5, 10, 15, 20, 25], [1, 7, 13, 19, 25], [5, 9, 13, 17, 21]]
+
+  def reset
+    (1..25).each { |i| @squares[i] = Square.new }
+  end
+
+  # rubocop:disable Metrics/AbcSize
+  def draw
+    labels = labelize_squares
+    puts '     |     |     |     |'
+    puts "  #{labels[1]}  |  #{labels[2]}  |  #{labels[3]}  |  #{labels[4]}  |  #{labels[5]}"
+    puts '     |     |     |     |'
+    puts '-----+-----+-----+-----+-----'
+    puts '     |     |     |     |'
+    puts "  #{labels[6]}  |  #{labels[7]}  |  #{labels[8]}  |  #{labels[9]}  |  #{labels[10]}"
+    puts '     |     |     |     |'
+    puts '-----+-----+-----+-----+-----'
+    puts '     |     |     |     |'
+    puts "  #{labels[11]} |  #{labels[12]} |  #{labels[13]} |  #{labels[14]} |  #{labels[15]}"
+    puts '     |     |     |     |'
+    puts '-----+-----+-----+-----+-----'
+    puts '     |     |     |     |'
+    puts "  #{labels[16]} |  #{labels[17]} |  #{labels[18]} |  #{labels[19]} |  #{labels[20]}"
+    puts '     |     |     |     |'
+    puts '-----+-----+-----+-----+-----'
+    puts '     |     |     |     |'
+    puts "  #{labels[21]} |  #{labels[22]} |  #{labels[23]} |  #{labels[24]} |  #{labels[25]}"
+    puts '     |     |     |     |'
+  end
+  # rubocop:enable Metrics/AbcSize
+
+  def winning_marker
+    WINNING_LINES.each do |line|
+      sqrs = @squares.values_at(*line)
+      return sqrs.first.marker if idential_markers?(sqrs)
+    end
+    nil
+  end
+
+  def open_square(marker)
+    WINNING_LINES.each do |line|
+      marker_count = @squares.values_at(*line).count do |sqr|
+        "#{sqr}" == marker
+      end
+
+      open_count = @squares.values_at(*line).count do |sqr|
+        "#{sqr}" == Square::INITIAL_MARKER
+      end
+
+      if marker_count == 4 && open_count == 1
+        return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
+      end
+    end
+
+    nil
+  end
+
+  private
+
+  def idential_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.count != 5
+    markers.min == markers.max
+  end
+
+  def labelize_squares
+    results = {}
+    (1..25).each do |i|
+      padding = i < 10 ? '' : ' '
+      results[i] = "#{@squares[i]}" == ' ' ? i : "#{@squares[i]}#{padding}"
+    end
+    results
   end
 end
 
@@ -192,7 +276,7 @@ class TTTGame
   attr_reader :board, :human, :computer
 
   def initialize
-    @board = Board.new
+    @board = FiveByFiveBoard.new
     @human = Player.new
     @computer = Computer.new
     set_markers
