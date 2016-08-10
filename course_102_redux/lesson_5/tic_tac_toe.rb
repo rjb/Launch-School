@@ -34,6 +34,20 @@ class Board
   def middle_square
     (@squares.length / 2) + 1
   end
+
+  def winning_marker(lines, count)
+    lines.each do |line|
+      sqrs = @squares.values_at(*line)
+      return sqrs.first.marker if identical_markers?(sqrs, count)
+    end
+    nil
+  end
+
+  def identical_markers?(squares, count)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.count != count
+    markers.min == markers.max
+  end
 end
 
 # 3x3 board
@@ -110,35 +124,30 @@ class FiveByFiveBoard < Board
 
   # rubocop:disable Metrics/AbcSize
   def draw
-    labels = labelize_squares
-    puts '     |     |     |     |'
-    puts "  #{labels[1]}  |  #{labels[2]}  |  #{labels[3]}  |  #{labels[4]}  |  #{labels[5]}"
-    puts '     |     |     |     |'
-    puts '-----+-----+-----+-----+-----'
-    puts '     |     |     |     |'
-    puts "  #{labels[6]}  |  #{labels[7]}  |  #{labels[8]}  |  #{labels[9]}  |  #{labels[10]}"
+    puts '  1  |  2  |  3  |  4  |  5'
+    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}  |  #{@squares[4]}  |  #{@squares[5]}"
     puts '     |     |     |     |'
     puts '-----+-----+-----+-----+-----'
-    puts '     |     |     |     |'
-    puts "  #{labels[11]} |  #{labels[12]} |  #{labels[13]} |  #{labels[14]} |  #{labels[15]}"
-    puts '     |     |     |     |'
-    puts '-----+-----+-----+-----+-----'
-    puts '     |     |     |     |'
-    puts "  #{labels[16]} |  #{labels[17]} |  #{labels[18]} |  #{labels[19]} |  #{labels[20]}"
+    puts '  6  |  7  |  8  |  9  |  10'
+    puts "  #{@squares[6]}  |  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}  |  #{@squares[10]}"
     puts '     |     |     |     |'
     puts '-----+-----+-----+-----+-----'
+    puts '  11 |  12 |  13 |  14 |  15'
+    puts "  #{@squares[11]}  |  #{@squares[12]}  |  #{@squares[13]}  |  #{@squares[14]}  |  #{@squares[15]}"
     puts '     |     |     |     |'
-    puts "  #{labels[21]} |  #{labels[22]} |  #{labels[23]} |  #{labels[24]} |  #{labels[25]}"
+    puts '-----+-----+-----+-----+-----'
+    puts '  16 |  17 |  18 |  19 |  20'
+    puts "  #{@squares[16]}  |  #{@squares[17]}  |  #{@squares[18]}  |  #{@squares[19]}  |  #{@squares[20]}"
+    puts '     |     |     |     |'
+    puts '-----+-----+-----+-----+-----'
+    puts '  21 |  22 |  23 |  24 |  25'
+    puts "  #{@squares[21]}  |  #{@squares[22]}  |  #{@squares[23]}  |  #{@squares[24]}  |  #{@squares[25]}"
     puts '     |     |     |     |'
   end
   # rubocop:enable Metrics/AbcSize
 
   def winning_marker
-    WINNING_LINES.each do |line|
-      sqrs = @squares.values_at(*line)
-      return sqrs.first.marker if idential_markers?(sqrs)
-    end
-    nil
+    super(WINNING_LINES, 5)
   end
 
   def open_square(marker)
@@ -160,12 +169,6 @@ class FiveByFiveBoard < Board
   end
 
   private
-
-  def idential_markers?(squares)
-    markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.count != 5
-    markers.min == markers.max
-  end
 
   def labelize_squares
     results = {}
