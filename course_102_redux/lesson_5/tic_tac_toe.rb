@@ -35,23 +35,41 @@ class Board
     (@squares.length / 2) + 1
   end
 
-  def winning_marker(lines, count)
-    lines.each do |line|
+  def winning_marker
+    self.class::WINNING_LINES.each do |line|
       sqrs = @squares.values_at(*line)
-      return sqrs.first.marker if identical_markers?(sqrs, count)
+      return sqrs.first.marker if identical_markers?(sqrs)
     end
     nil
   end
 
-  def identical_markers?(squares, count)
+  def identical_markers?(squares)
     markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.count != count
+    return false if markers.count != self.class::WINNING_COUNT
     markers.min == markers.max
+  end
+
+  def open_square(marker)
+    self.class::WINNING_LINES.each do |line|
+      marker_count = @squares.values_at(*line).count do |sqr|
+        "#{sqr}" == marker
+      end
+
+      open_count = @squares.values_at(*line).count do |sqr|
+        "#{sqr}" == Square::INITIAL_MARKER
+      end
+
+      if marker_count == self.class::WINNING_COUNT - 1 && open_count == 1
+        return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
+      end
+    end
+    nil
   end
 end
 
 # 3x3 board
-class ThreeByThreeBoard < Board
+class SmallBoard < Board
+  WINNING_COUNT = 3
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
                    [1, 4, 7], [2, 5, 8], [3, 6, 9],
                    [1, 5, 9], [3, 5, 7]]
@@ -75,44 +93,11 @@ class ThreeByThreeBoard < Board
     puts '     |     |'
   end
   # rubocop:enable Metrics/AbcSize
-
-  def winning_marker
-    WINNING_LINES.each do |line|
-      sqrs = @squares.values_at(*line)
-      return sqrs.first.marker if three_idential_markers?(sqrs)
-    end
-    nil
-  end
-
-  def open_square(marker)
-    WINNING_LINES.each do |line|
-      marker_count = @squares.values_at(*line).count do |sqr|
-        "#{sqr}" == marker
-      end
-
-      open_count = @squares.values_at(*line).count do |sqr|
-        "#{sqr}" == Square::INITIAL_MARKER
-      end
-
-      if marker_count == 2 && open_count == 1
-        return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
-      end
-    end
-
-    nil
-  end
-
-  private
-
-  def three_idential_markers?(squares)
-    markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.count != 3
-    markers.min == markers.max
-  end
 end
 
 # 5x5 board
-class FiveByFiveBoard < Board
+class Medium < Board
+  WINNING_COUNT = 5
   WINNING_LINES = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15],
                    [16, 17, 18, 19, 20], [21, 22, 23, 24, 25], [1, 6, 11, 16, 21],
                    [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
@@ -145,28 +130,6 @@ class FiveByFiveBoard < Board
     puts '     |     |     |     |'
   end
   # rubocop:enable Metrics/AbcSize
-
-  def winning_marker
-    super(WINNING_LINES, 5)
-  end
-
-  def open_square(marker)
-    WINNING_LINES.each do |line|
-      marker_count = @squares.values_at(*line).count do |sqr|
-        "#{sqr}" == marker
-      end
-
-      open_count = @squares.values_at(*line).count do |sqr|
-        "#{sqr}" == Square::INITIAL_MARKER
-      end
-
-      if marker_count == 4 && open_count == 1
-        return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
-      end
-    end
-
-    nil
-  end
 
   private
 
@@ -279,7 +242,7 @@ class TTTGame
   attr_reader :board, :human, :computer
 
   def initialize
-    @board = FiveByFiveBoard.new
+    @board = SmallBoard.new
     @human = Player.new
     @computer = Computer.new
     set_markers
