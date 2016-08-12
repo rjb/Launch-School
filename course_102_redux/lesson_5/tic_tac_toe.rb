@@ -7,8 +7,42 @@ class Board
     reset
   end
 
-  def someone_won?
-    !!winning_marker
+  def reset
+    count = self.class::SIZE
+    (1..(count*count)).each { |i| @squares[i] = Square.new }
+  end
+
+  def draw
+    step = 0
+    (1..self.class::SIZE).each do |row|
+      line = ''
+      (1..self.class::SIZE).each do |i|
+        square_num = i + step
+        label = (self.class::SIZE > 3 ? "#{square_num}" : ' ') + (square_num < 10 ? ' ' : '')
+        line += "  #{label} |"
+      end
+      puts line[0...-1]
+
+      line = ''
+      (1..self.class::SIZE).each do |i|
+        line += '  '
+        line += "#{@squares[i + step]}"
+        line += '  |' unless i == self.class::SIZE
+      end
+      puts line
+
+      line = ''
+      (self.class::SIZE - 1).times { |i| line += "     |" }
+      puts line
+
+      unless row == self.class::SIZE
+        line = ''
+        (self.class::SIZE).times { line += "-----+" }
+        puts line[0...-1]
+      end
+
+      step += self.class::SIZE
+    end
   end
 
   def []=(num, marker)
@@ -35,20 +69,6 @@ class Board
     (@squares.length / 2) + 1
   end
 
-  def winning_marker
-    self.class::WINNING_LINES.each do |line|
-      sqrs = @squares.values_at(*line)
-      return sqrs.first.marker if identical_markers?(sqrs)
-    end
-    nil
-  end
-
-  def identical_markers?(squares)
-    markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.count != self.class::WINNING_COUNT
-    markers.min == markers.max
-  end
-
   def open_square(marker)
     self.class::WINNING_LINES.each do |line|
       marker_count = @squares.values_at(*line).count do |sqr|
@@ -59,88 +79,71 @@ class Board
         "#{sqr}" == Square::INITIAL_MARKER
       end
 
-      if marker_count == self.class::WINNING_COUNT - 1 && open_count == 1
+      if marker_count == self.class::SIZE - 1 && open_count == 1
         return line.find { |i| "#{@squares[i]}" == Square::INITIAL_MARKER }
       end
     end
     nil
   end
+
+  def someone_won?
+    !!winning_marker
+  end
+
+  def winning_marker
+    self.class::WINNING_LINES.each do |line|
+      sqrs = @squares.values_at(*line)
+      return sqrs.first.marker if identical_markers?(sqrs)
+    end
+    nil
+  end
+
+  private
+
+  def identical_markers?(squares)
+    markers = squares.select(&:marked?).collect(&:marker)
+    return false if markers.count != self.class::SIZE
+    markers.min == markers.max
+  end
 end
 
 # 3x3 board
 class SmallBoard < Board
-  WINNING_COUNT = 3
-  WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9],
-                   [1, 4, 7], [2, 5, 8], [3, 6, 9],
-                   [1, 5, 9], [3, 5, 7]]
-
-  def reset
-    (1..9).each { |i| @squares[i] = Square.new }
-  end
-
-  # rubocop:disable Metrics/AbcSize
-  def draw
-    puts '     |     |'
-    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
-    puts '     |     |'
-    puts '-----+-----+-----'
-    puts '     |     |'
-    puts "  #{@squares[4]}  |  #{@squares[5]}  |  #{@squares[6]}"
-    puts '     |     |'
-    puts '-----+-----+-----'
-    puts '     |     |'
-    puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
-    puts '     |     |'
-  end
-  # rubocop:enable Metrics/AbcSize
+  SIZE = 3
+  MAX_PLAYER_COUNT = 2
+  WINNING_LINES = [
+    [1, 2, 3], [4, 5, 6], [7, 8, 9],
+    [1, 4, 7], [2, 5, 8], [3, 6, 9],
+    [1, 5, 9], [3, 5, 7]
+  ]
 end
 
 # 5x5 board
 class MediumBoard < Board
-  WINNING_COUNT = 5
-  WINNING_LINES = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15],
-                   [16, 17, 18, 19, 20], [21, 22, 23, 24, 25], [1, 6, 11, 16, 21],
-                   [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
-                   [5, 10, 15, 20, 25], [1, 7, 13, 19, 25], [5, 9, 13, 17, 21]]
+  SIZE = 5
+  WINNING_LINES = [
+    [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15],
+    [16, 17, 18, 19, 20], [21, 22, 23, 24, 25], [1, 6, 11, 16, 21],
+    [2, 7, 12, 17, 22], [3, 8, 13, 18, 23], [4, 9, 14, 19, 24],
+    [5, 10, 15, 20, 25], [1, 7, 13, 19, 25], [5, 9, 13, 17, 21]
+  ]
+end
 
-  def reset
-    (1..25).each { |i| @squares[i] = Square.new }
-  end
-
-  # rubocop:disable Metrics/AbcSize
-  def draw
-    puts '  1  |  2  |  3  |  4  |  5'
-    puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}  |  #{@squares[4]}  |  #{@squares[5]}"
-    puts '     |     |     |     |'
-    puts '-----+-----+-----+-----+-----'
-    puts '  6  |  7  |  8  |  9  |  10'
-    puts "  #{@squares[6]}  |  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}  |  #{@squares[10]}"
-    puts '     |     |     |     |'
-    puts '-----+-----+-----+-----+-----'
-    puts '  11 |  12 |  13 |  14 |  15'
-    puts "  #{@squares[11]}  |  #{@squares[12]}  |  #{@squares[13]}  |  #{@squares[14]}  |  #{@squares[15]}"
-    puts '     |     |     |     |'
-    puts '-----+-----+-----+-----+-----'
-    puts '  16 |  17 |  18 |  19 |  20'
-    puts "  #{@squares[16]}  |  #{@squares[17]}  |  #{@squares[18]}  |  #{@squares[19]}  |  #{@squares[20]}"
-    puts '     |     |     |     |'
-    puts '-----+-----+-----+-----+-----'
-    puts '  21 |  22 |  23 |  24 |  25'
-    puts "  #{@squares[21]}  |  #{@squares[22]}  |  #{@squares[23]}  |  #{@squares[24]}  |  #{@squares[25]}"
-    puts '     |     |     |     |'
-  end
-  # rubocop:enable Metrics/AbcSize
-
-  private
-
-  def labelize_squares
-    results = {}
-    (1..25).each do |i|
-      padding = i < 10 ? '' : ' '
-      results[i] = "#{@squares[i]}" == ' ' ? i : "#{@squares[i]}#{padding}"
-    end
-    results
-  end
+# 9x9 board
+class LargeBoard < Board
+  SIZE = 9
+  WINNING_LINES = [
+    [1, 2, 3, 4, 5, 6, 7, 8, 9], [10, 11, 12, 13, 14, 15, 16, 17, 18],
+    [19, 20, 21, 22, 23, 24, 25, 26, 27], [28, 29, 30, 31, 32, 33, 34, 35, 36],
+    [37, 38, 39, 40, 41, 42, 43, 44, 45], [46, 47, 48, 49, 50, 51, 52, 53, 54],
+    [55, 56, 57, 58, 59, 60, 61, 62, 63], [64, 65, 66, 67, 68, 69, 70, 71, 72],
+    [73, 74, 75, 76, 77, 78, 79, 80, 81], [1, 10, 19, 28, 37, 46, 55, 64, 73],
+    [2, 11, 20, 29, 38, 47, 56, 65, 74], [3, 12, 21, 30, 39, 48, 57, 66, 75],
+    [4, 13, 22, 31, 40, 49, 58, 67, 76], [5, 14, 23, 32, 41, 50, 59, 68, 77],
+    [6, 15, 24, 33, 42, 51, 60, 69, 78], [7, 16, 25, 34, 43, 52, 61, 70, 79],
+    [8, 17, 26, 35, 44, 53, 62, 71, 80], [9, 18, 27, 36, 45, 54, 63, 72, 81],
+    [1, 11, 21, 31, 41, 51, 61, 71, 81], [9, 17, 25, 33, 41, 49, 57, 65, 73]
+  ]
 end
 
 # Square
@@ -242,7 +245,7 @@ class TTTGame
   attr_reader :board, :human, :computer
 
   def initialize
-    @board = SmallBoard.new
+    @board = LargeBoard.new
     @human = Player.new
     @computer = Computer.new
     set_markers
