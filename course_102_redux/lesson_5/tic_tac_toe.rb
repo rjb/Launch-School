@@ -245,7 +245,7 @@ class TTTGame
   attr_reader :board, :human, :computer
 
   def initialize
-    @board = LargeBoard.new
+    @board = set_board
     @human = Player.new
     @computer = Computer.new
     set_markers
@@ -337,6 +337,28 @@ class TTTGame
       when computer.marker
         computer.name
       end
+  end
+
+  def set_board
+    case choose_board
+    when 3
+      SmallBoard.new
+    when 5
+      MediumBoard.new
+    when 9
+      LargeBoard.new
+    end
+  end
+
+  def choose_board
+    b = nil
+    loop do
+      puts "Pick a board size: 3x3 (3), 5x5 (5), or 9x9 (9)"
+      b = gets.chomp.to_i
+      break if [3, 5, 9].include?(b)
+      puts 'Invalid choice.'
+    end
+    b
   end
 
   def choose_marker
