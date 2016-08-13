@@ -7,7 +7,7 @@ class Board
 
   def reset
     count = self.class::SIZE
-    (1..(count*count)).each { |i| @squares[i] = Square.new }
+    (1..(count * count)).each { |i| @squares[i] = Square.new }
   end
 
   def draw
@@ -30,12 +30,12 @@ class Board
       puts line
 
       line = ''
-      (self.class::SIZE - 1).times { |i| line += "     |" }
+      (self.class::SIZE - 1).times { line += '     |' }
       puts line
 
       unless row == self.class::SIZE
         line = ''
-        (self.class::SIZE).times { line += "-----+" }
+        (self.class::SIZE).times { line += '-----+' }
         puts line[0...-1]
       end
 
@@ -350,7 +350,7 @@ class TTTGame
   def choose_board
     b = nil
     loop do
-      puts "Pick a board size: 3x3 (3), 5x5 (5), or 9x9 (9)"
+      puts 'Pick a board size: 3x3 (3), 5x5 (5), or 9x9 (9)'
       b = gets.chomp.to_i
       break if [3, 5, 9].include?(b)
       puts 'Invalid choice.'
@@ -361,9 +361,9 @@ class TTTGame
   def set_first_player
     m = ''
     loop do
-      puts "Pick first player: Player (p) or Computer (c)?"
+      puts 'Pick first player: Player (p) or Computer (c)?'
       m = gets.chomp.downcase
-      break if ['p', 'c'].include?(m)
+      break if %w(p c).include?(m)
       puts 'Invalide choice.'
     end
     m == 'p' ? human.marker : computer.marker
