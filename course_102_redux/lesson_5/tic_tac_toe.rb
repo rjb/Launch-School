@@ -1,5 +1,3 @@
-require 'pry'
-
 # Board
 class Board
   def initialize
@@ -451,15 +449,16 @@ class TTTGame
   end
 
   def computer_moves
-    square = if board.win_opportunity?(computer.marker)
-               board.open_square(computer.marker)
-             elsif board.win_opportunity?(human.marker)
-               board.open_square(human.marker)
-             elsif board.middle_square_open?
-               board.middle_square
-             else
-               board.unmarked_keys.sample
-             end
+    square =
+      if board.win_opportunity?(computer.marker)
+        board.open_square(computer.marker)
+      elsif board.win_opportunity?(human.marker)
+        board.open_square(human.marker)
+      elsif board.middle_square_open?
+        board.middle_square
+      else
+        board.unmarked_keys.sample
+      end
     board[square] = computer.marker
   end
 
