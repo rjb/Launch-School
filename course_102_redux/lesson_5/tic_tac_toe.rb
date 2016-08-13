@@ -109,6 +109,7 @@ end
 
 # 3x3 board
 class SmallBoard < Board
+  MARKERS = %w(X O)
   SIZE = 3
   MAX_PLAYER_COUNT = 2
   WINNING_LINES = [
@@ -120,7 +121,9 @@ end
 
 # 5x5 board
 class MediumBoard < Board
+  MARKERS = %w(X O Y)
   SIZE = 5
+  MAX_PLAYER_COUNT = 3
   WINNING_LINES = [
     [1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15],
     [16, 17, 18, 19, 20], [21, 22, 23, 24, 25], [1, 6, 11, 16, 21],
@@ -131,7 +134,9 @@ end
 
 # 9x9 board
 class LargeBoard < Board
+  MARKERS = %w(X O Y * #)
   SIZE = 9
+  MAX_PLAYER_COUNT = 5
   WINNING_LINES = [
     [1, 2, 3, 4, 5, 6, 7, 8, 9], [10, 11, 12, 13, 14, 15, 16, 17, 18],
     [19, 20, 21, 22, 23, 24, 25, 26, 27], [28, 29, 30, 31, 32, 33, 34, 35, 36],
@@ -240,7 +245,6 @@ end
 class TTTGame
   # Options: player, computer, choose
   FIRST_PLAYER = 'choose'
-  MARKERS = %w(X O)
 
   attr_reader :board, :human, :computer
 
@@ -380,16 +384,16 @@ class TTTGame
   def set_human_marker
     m = ''
     loop do
-      puts "Pick a marker (#{choices_to_english(MARKERS)}):"
+      puts "Pick a marker (#{choices_to_english(board.class::MARKERS)}):"
       m = gets.chomp.capitalize
-      break unless m.empty? || !MARKERS.include?(m)
+      break unless m.empty? || !board.class::MARKERS.include?(m)
       puts 'Invalid marker.'
     end
     human.marker = m
   end
 
   def set_computer_marker
-    computer.marker = MARKERS.select { |m| m != "#{human.marker}" }.sample
+    computer.marker = board.class::MARKERS.select { |m| m != "#{human.marker}" }.sample
   end
 
   def award_point
