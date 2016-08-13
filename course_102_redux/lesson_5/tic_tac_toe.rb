@@ -237,7 +237,7 @@ end
 class TTTGame
   # Options: player, computer, choose
   FIRST_PLAYER = 'choose'
-  MARKERS = %w(X O)
+  MARKERS = %w(X O * $ #)
 
   attr_reader :board, :human, :computer
 
@@ -322,7 +322,7 @@ class TTTGame
       when 'computer'
         computer.marker
       when 'choose'
-        choose_marker
+        set_first_player
       end
   end
 
@@ -358,10 +358,10 @@ class TTTGame
     b
   end
 
-  def choose_marker
+  def set_first_player
     m = ''
     loop do
-      puts "Who goes first, Player (p) or Computer (c)?"
+      puts "Pick first player: Player (p) or Computer (c)?"
       m = gets.chomp.downcase
       break if ['p', 'c'].include?(m)
       puts 'Invalide choice.'
