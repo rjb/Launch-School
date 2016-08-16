@@ -187,7 +187,6 @@ end
 
 class Game
   GAME_MESSAGE = "Welcome to Twenty-One!\n$1 per game. First to $5 wins."
-  FIRST_PLAYER = 'player'
 
   attr_reader :deck, :human, :dealer, :current_player
 
@@ -271,7 +270,7 @@ class Game
   def clear_table
     human.clear_hand
     dealer.clear_hand
-    @current_player = FIRST_PLAYER
+    @current_player = human.name
   end
 
   def player_turn
@@ -302,9 +301,9 @@ class Game
   def deal_card
     sleep(0.5)
     case current_player
-    when 'player'
+    when human.name
       human.hit(dealer.deal(deck))
-    when 'dealer'
+    when dealer.name
       flip = dealer.hand.cards.count == 0 ? false : true
       dealer.hit(dealer.deal(deck, flip))
     end
@@ -314,10 +313,10 @@ class Game
   # Change checks to players name (once implemented)
   def alternate_player
     case current_player
-    when 'player'
-      @current_player = 'dealer'
-    when 'dealer'
-      @current_player = 'player'
+    when human.name
+      @current_player = dealer.name
+    when dealer.name
+      @current_player = human.name
     end
   end
 
@@ -330,12 +329,12 @@ class Game
       dealer
     elsif dealer.busted?
       human
+    elsif human == dealer
+      nil
     elsif human > dealer
       human
     elsif dealer > human
       dealer
-    elsif human == dealer
-      nil
     end
   end
 end
