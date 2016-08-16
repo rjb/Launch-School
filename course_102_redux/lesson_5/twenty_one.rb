@@ -1,10 +1,9 @@
 class Participant
-  attr_accessor :hand
+  attr_accessor :hand, :name
 
   def initialize
+    set_name
     clear_hand
-    # what would the "data" or "states" of a Player object entail?
-    # maybe cards? a name?
   end
 
   def clear_hand
@@ -40,10 +39,32 @@ class Participant
 end
 
 class Player < Participant
+  def set_name
+    n = ''
+    loop do
+      puts 'What is your name?'
+      n = gets.chomp
+      break unless n.empty?
+      puts 'Invalid name.'
+    end
+    self.name = n
+  end
 end
 
 class Dealer < Participant
   HIT_MINIMUM = 17
+  NAMES = [
+    'HAL',
+    'C-3PO',
+    'Number5',
+    'GERTY',
+    'RobotB-9',
+    'Rosie'
+  ]
+
+  def set_name
+    self.name = NAMES.sample
+  end
 
   def deal(deck, flip = true)
     card = deck.deal
@@ -65,8 +86,6 @@ class Deck
   def initialize
     @cards = []
     initialize_cards
-    # obviously, we need some data structure to keep track of cards
-    # array, hash, something else?
   end
 
   def shuffle
@@ -240,8 +259,8 @@ class Game
   end
 
   def show_hands
-    puts "Player (#{human.total}): #{human.hand}"
-    puts "Dealer (#{dealer.total}): #{dealer.hand}"
+    puts "#{human.name} (#{human.total}): #{human.hand}"
+    puts "#{dealer.name} (#{dealer.total}): #{dealer.hand}"
   end
 
   def shuffle_deck
