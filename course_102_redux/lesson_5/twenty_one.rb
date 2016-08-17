@@ -173,7 +173,7 @@ class Hand
   end
 
   def to_s
-    cards.map(&:to_s).join(' | ')
+    cards.map(&:to_s).join(' ')
   end
 
   def twenty_one?
@@ -232,19 +232,30 @@ class Game
   private
 
   def display_shuffling_deck
-    system 'clear'
-    display_game_message
-    puts '-----------------------------'
-    puts 'shuffling...'
-    puts '-----------------------------'
-    sleep(0.5)
+    cards = []
+    2.times do
+      15.times { display_cards_spreading(cards) }
+      15.times  { display_cards_shuffling(cards) }
+    end
+  end
+
+  def display_cards_spreading(cards)
+    cards << Card::DOWN_CARD
+    display_table { puts cards.join(' ') }
+    sleep(0.05)
+  end
+
+  def display_cards_shuffling(cards)
+    cards.pop
+    display_table { puts cards.join(' ') }
+    sleep(0.05)
   end
 
   def display_table
     system 'clear'
     display_game_message
     puts '-----------------------------'
-    show_hands
+    block_given? ? yield : show_hands
     puts '-----------------------------'
   end
 
