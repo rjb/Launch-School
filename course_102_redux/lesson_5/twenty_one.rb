@@ -15,6 +15,14 @@ class Wallet
     self.value -= amount unless amount > value
   end
 
+  def <(amount)
+    self.value < amount
+  end
+
+  def >=(amount)
+    self.value >= amount
+  end
+
   def to_s
     result = '%.2f' % value
     "#{CURRENCY}#{result}"
@@ -66,6 +74,7 @@ class Participant
 end
 
 class Player < Participant
+  attr_accessor :bet
   attr_reader :wallet
 
   def initialize
@@ -82,6 +91,10 @@ class Player < Participant
       puts 'Invalid name.'
     end
     self.name = n
+  end
+
+  def bet_made?
+    !!bet
   end
 end
 
@@ -260,10 +273,10 @@ class Hand
 end
 
 class Game
-  BID = 1
+  MIN_BET = 1
   STANDARD_PAYOUT = 1/1
   TWENTY_ONE_PAYOUT = 3.0/2.0
-  GAME_MESSAGE = "Welcome to Twenty-One!\nMax bet: $1"
+  GAME_MESSAGE = "Welcome to Twenty-One!\nTable minimum: $#{MIN_BET}"
 
   attr_reader :shoe, :human, :dealer, :current_player
 
@@ -274,20 +287,11 @@ class Game
   end
 
   def start
-    # Need to check if out of cards and add in new deck if out
     shuffle_deck
     display_table
 
     loop do
-      # Update to 'Deal (d), change bet (c), or cash out ($)'
-      puts 'Deal (d) or cash out ($)'
-      break if gets.chomp.start_with?('$')
-
-      if wallet_empty?
-        puts 'You are out of cash.'
-        break
-      end
-
+      set_action
       clear_table
       withraw_bid
 
@@ -299,11 +303,18 @@ class Game
         break if human.busted?
 
         dealer_turn
-        puts 'Dealer busted!' if dealer.busted?
       end
 
       award_winner
       show_result
+
+      if wallet_empty?
+        puts "You're out of cash."
+        break
+      end
+
+      puts 'Play another hand (p) or cash out ($)?'
+      break if gets.chomp.start_with?('$')
     end
 
     puts 'Goodbye!'
@@ -341,6 +352,30 @@ class Game
     puts '-----------------------------'
     show_hands
     puts '-----------------------------'
+  end
+
+  def set_bet
+    bet = nil
+    loop do
+      puts 'Place your bet?'
+      bet = gets.chomp.to_f
+      break if valid_bet?(bet)
+      display_invalid_bet_message(bet)
+    end
+    human.bet = bet
+  end
+
+  def set_action
+    loop do
+      set_bet
+      puts 'Change bet (c) or deal (d)'
+      break if gets.chomp.downcase.start_with?('d')
+    end
+  end
+
+  def display_invalid_bet_message(bet)
+    puts 'Bet is too low.' if bet < MIN_BET
+    puts "You're wallet is a little light." if human.wallet < bet
   end
 
   def display_game_message
@@ -484,20 +519,24 @@ class Game
 
   def award_winner
     if human.twenty_one?
-      human.wallet.deposit(((TWENTY_ONE_PAYOUT) * BID) + BID)
+      human.wallet.deposit(((TWENTY_ONE_PAYOUT) * human.bet) + human.bet)
     elsif human_won?
-      human.wallet.deposit(((STANDARD_PAYOUT) * BID) + BID) if human_won?
+      human.wallet.deposit(((STANDARD_PAYOUT) * human.bet) + human.bet) if human_won?
     elsif draw?
-      human.wallet.deposit(BID) if draw?
+      human.wallet.deposit(human.bet) if draw?
     end
   end
 
   def withraw_bid
-    human.wallet.withdraw(BID)
+    human.wallet.withdraw(human.bet)
   end
 
   def wallet_empty?
     human.wallet.empty?
+  end
+
+  def valid_bet?(bet)
+    bet >= MIN_BET && human.wallet >= bet
   end
 end
 
