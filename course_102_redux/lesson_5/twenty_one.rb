@@ -1,5 +1,18 @@
+module Currency
+  CURRENCIES = {
+    'US' => '$',
+    'UK' => '£'
+  }
+
+  def format_as_currency(amount)
+    "#{Wallet::CURRENCY}%.2f" % amount
+  end
+end
+
 class Wallet
-  CURRENCY = '$'
+  include Currency
+
+  CURRENCY = CURRENCIES['US']
 
   attr_accessor :value
 
@@ -24,8 +37,7 @@ class Wallet
   end
 
   def to_s
-    result = '%.2f' % value
-    "#{CURRENCY}#{result}"
+    "#{format_as_currency(value)}"
   end
 
   def empty?
@@ -273,10 +285,11 @@ class Hand
 end
 
 class Game
+  include Currency
+
   MIN_BET = 1
   STANDARD_PAYOUT = 1/1
   TWENTY_ONE_PAYOUT = 3.0/2.0
-  GAME_MESSAGE = "Welcome to Twenty-One!\nTable minimum: $#{MIN_BET}"
 
   attr_reader :shoe, :human, :dealer, :current_player
 
@@ -379,7 +392,7 @@ class Game
   end
 
   def display_game_message
-    puts GAME_MESSAGE
+    puts "Welcome to Twenty-One!\nTable minimum: #{format_as_currency(MIN_BET)}"
   end
 
   def reveal_dealers_hand
