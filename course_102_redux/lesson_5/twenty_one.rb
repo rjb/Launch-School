@@ -583,7 +583,7 @@ class Game
     if human.twenty_one?
       human.wallet.deposit(((TWENTY_ONE_PAYOUT) * human.bet) + human.bet)
     elsif human_won?
-      human.wallet.deposit(((STANDARD_PAYOUT) * human.bet) + human.bet) if human_won?
+      human.wallet.deposit(((STANDARD_PAYOUT) * human.bet) + human.bet)
     elsif draw?
       human.wallet.deposit(human.bet) if draw?
     end
