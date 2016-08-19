@@ -1,7 +1,11 @@
+# Add banker for when out of cash
+# Add red card to shoe
 module Currency
   CURRENCIES = {
     'US' => '$',
-    'UK' => '£'
+    'UK' => '£',
+    'EU' => '€',
+    'JP' => '¥'
   }
 
   def format_as_currency(amount)
@@ -76,6 +80,10 @@ class Participant
     total == other_player.total
   end
 
+  def hand_empty?
+    hand.empty?
+  end
+
   def twenty_one?
     hand.twenty_one? && hand.two_cards?
   end
@@ -135,13 +143,8 @@ class Dealer < Participant
 end
 
 class Shoe
-  # Put 4 decks of cards in the shoe
-  # Place cut (red) card into shoe (near end)
-  # Dealer deals and flips cards from the shoe
-  # If dealer hits red card:
-  #   1. finish the play
-  #   2. shuffles 4 decks of cards
   DECK_COUNT = 4
+  CUT_CARD = "\u{1F0A0}"
 
   attr_reader :cards
 
@@ -154,6 +157,10 @@ class Shoe
     cards.shuffle!
   end
 
+  def place_cut_card
+    @cards.insert(random_spot, Card.new(CUT_CARD))
+  end
+
   def deal
     cards.shift
   end
@@ -162,6 +169,14 @@ class Shoe
 
   def initialize_cards
     DECK_COUNT.times { @cards.push(*Deck.new.cards) }
+  end
+
+  def random_spot
+    -(size * rand(0.10..0.25))
+  end
+
+  def size
+    cards.length
   end
 end
 
@@ -282,6 +297,10 @@ class Hand
   def two_cards?
     count == 2
   end
+
+  def empty?
+    count == 0
+  end
 end
 
 class Game
@@ -290,18 +309,17 @@ class Game
   MIN_BET = 1
   STANDARD_PAYOUT = 1/1
   TWENTY_ONE_PAYOUT = 3.0/2.0
+  CUT_CARD_MESSAGE = 'Cut card. Last hand before shuffle.'
 
-  attr_reader :shoe, :human, :dealer, :current_player
+  attr_reader :shoe, :human, :dealer, :current_player, :cut_card
 
   def initialize
     @human = Player.new
     @dealer = Dealer.new
-    @shoe = Shoe.new
   end
 
   def start
-    shuffle_deck
-    display_table
+    reset_shoe
 
     loop do
       set_action
@@ -328,6 +346,11 @@ class Game
 
       puts 'Play another hand (p) or cash out ($)?'
       break if gets.chomp.start_with?('$')
+
+      if last_hand?
+        clear_table
+        reset_shoe
+      end
     end
 
     puts 'Goodbye!'
@@ -335,12 +358,19 @@ class Game
 
   private
 
+  def reset_shoe
+    @shoe = Shoe.new
+    @cut_card_message = nil
+    shuffle_deck
+    shoe.place_cut_card
+    display_table
+  end
+
   def display_shuffling_deck
     cards = []
-    2.times do
-      15.times { display_cards_spreading(cards) }
-      15.times { display_cards_shuffling(cards) }
-    end
+    15.times { display_cards_spreading(cards) }
+    15.times { display_cards_shuffling(cards) }
+    15.times { display_cards_spreading(cards) }
   end
 
   def display_cards_spreading(cards)
@@ -355,16 +385,29 @@ class Game
     sleep(0.05)
   end
 
+  def display_shoe
+    display_cut_card_message
+    display_shoe_cards unless @cut_card_message
+  end
+
+  def display_shoe_cards
+    shoe_cards = []
+    15.times { shoe_cards << Card::DOWN_CARD }
+    puts shoe_cards.join(' ')
+  end
+
   def display_table
     system 'clear'
     display_game_message
-    if block_given?
-      puts '-----------------------------'
-      yield
-    end
+    puts '-----------------------------'
+    block_given? ? yield : display_shoe
     puts '-----------------------------'
     show_hands
     puts '-----------------------------'
+  end
+
+  def display_cut_card_message
+    puts @cut_card_message if @cut_card_message
   end
 
   def set_bet
@@ -451,15 +494,21 @@ class Game
     end
   end
 
-  # SIMPLIFY!!!
   def deal_card
     sleep(0.5)
+    card = dealer.deal(shoe)
+
+    if cut_card?(card)
+      card = dealer.deal(shoe)
+      @cut_card_message = CUT_CARD_MESSAGE
+    end
+
     case current_player
     when human.name
-      human.hit(dealer.deal(shoe))
+      human.hit(card)
     when dealer.name
-      flip = dealer.hand.cards.count == 0 ? false : true
-      dealer.hit(dealer.deal(shoe, flip))
+      card.flip if dealer.hand_empty?
+      dealer.hit(card)
     end
     display_table
   end
@@ -550,6 +599,14 @@ class Game
 
   def valid_bet?(bet)
     bet >= MIN_BET && human.wallet >= bet
+  end
+
+  def cut_card?(card)
+    card.value == Shoe::CUT_CARD && !cut_card
+  end
+
+  def last_hand?
+    @cut_card_message
   end
 end
 
