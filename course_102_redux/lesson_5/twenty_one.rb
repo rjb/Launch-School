@@ -344,7 +344,7 @@ class Game
         break
       end
 
-      puts 'Play another hand (p) or cash out ($)?'
+      puts 'Play another hand <enter> or cash out ($)?'
       break if gets.chomp.start_with?('$')
 
       if shoe_nearly_empty?
