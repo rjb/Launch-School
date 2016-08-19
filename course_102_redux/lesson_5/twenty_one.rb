@@ -347,7 +347,7 @@ class Game
       puts 'Play another hand (p) or cash out ($)?'
       break if gets.chomp.start_with?('$')
 
-      if last_hand?
+      if shoe_nearly_empty?
         clear_table
         reset_shoe
       end
@@ -605,7 +605,7 @@ class Game
     card.value == Shoe::CUT_CARD && !cut_card
   end
 
-  def last_hand?
+  def shoe_nearly_empty?
     @cut_card_message
   end
 end
