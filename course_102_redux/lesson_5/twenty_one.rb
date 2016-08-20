@@ -203,12 +203,13 @@ end
 
 class Card
   DOWN_CARD = "\u{1F0A0}"
-  # UP and DOWN constants
+  UP_STATE = 'up'
+  DOWN_STATE = 'down'
 
   attr_accessor :value
   attr_reader :state
 
-  def initialize(value, state = 'down')
+  def initialize(value, state = DOWN_STATE)
     @value = value
     @state = state
   end
@@ -218,21 +219,16 @@ class Card
   end
 
   def flip
-    case state
-    when 'up'
-      @state = 'down'
-    when 'down'
-      @state = 'up'
-    end
+    @state = face_down? ? UP_STATE : DOWN_STATE
     self
   end
 
   def face_up?
-    state == 'up'
+    state == UP_STATE
   end
 
   def face_down?
-    state == 'down'
+    state == DOWN_STATE
   end
 end
 
