@@ -329,18 +329,9 @@ class Game
       award_winner
       show_result
 
-      if wallet_empty?
-        puts "You're out of cash."
-        break
-      end
+      break if wallet_empty? || cash_out?
 
-      break if cash_out?
-
-      # clear_table_and_reset_shoe if shoe_nearly_empty?
-      if shoe_nearly_empty?
-        clear_table
-        reset_shoe
-      end
+      clear_table_and_reset_shoe if shoe_nearly_empty?
     end
 
     cash_out
@@ -354,6 +345,11 @@ class Game
     shuffle_deck
     shoe.place_cut_card
     display_table
+  end
+
+  def clear_table_and_reset_shoe
+    clear_table
+    reset_shoe
   end
 
   def display_shuffling_deck
@@ -401,7 +397,11 @@ class Game
   end
 
   def display_cash_out_message
-    puts "Here's your #{human.wallet}"
+    if wallet_empty?
+      puts "You're out of cash."
+    else
+      puts "Here's your #{human.wallet}"
+    end
   end
 
   def display_goodbye_message
