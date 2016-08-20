@@ -1,5 +1,3 @@
-# Add banker for when out of cash
-# Add red card to shoe
 module Currency
   CURRENCIES = {
     'US' => '$',
@@ -63,9 +61,6 @@ class Participant
 
   def hit(card)
     self.hand << card
-  end
-
-  def stay
   end
 
   def total
@@ -209,7 +204,6 @@ end
 class Card
   DOWN_CARD = "\u{1F0A0}"
   # UP and DOWN constants
-  # Need RED_CARD
 
   attr_accessor :value
   attr_reader :state
@@ -353,7 +347,7 @@ class Game
       end
     end
 
-    puts 'Goodbye!'
+    cash_out
   end
 
   private
@@ -408,6 +402,14 @@ class Game
 
   def display_cut_card_message
     puts @cut_card_message if @cut_card_message
+  end
+
+  def display_cash_out_message
+    puts "Here's your #{human.wallet}"
+  end
+
+  def display_goodbye_message
+    puts 'Goodbye!'
   end
 
   def set_bet
@@ -591,6 +593,11 @@ class Game
 
   def withraw_bid
     human.wallet.withdraw(human.bet)
+  end
+
+  def cash_out
+    display_cash_out_message
+    display_goodbye_message
   end
 
   def wallet_empty?
