@@ -334,9 +334,9 @@ class Game
         break
       end
 
-      puts 'Play another hand <enter> or cash out ($)?'
-      break if gets.chomp.start_with?('$')
+      break if cash_out?
 
+      # clear_table_and_reset_shoe if shoe_nearly_empty?
       if shoe_nearly_empty?
         clear_table
         reset_shoe
@@ -594,6 +594,11 @@ class Game
   def cash_out
     display_cash_out_message
     display_goodbye_message
+  end
+
+  def cash_out?
+    puts 'Play another hand <enter> or cash out ($)?'
+    gets.chomp.start_with?('$')
   end
 
   def wallet_empty?
