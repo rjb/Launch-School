@@ -135,11 +135,15 @@ class Dealer < Participant
   def reveal_hand
     hand.reveal
   end
+
+  def discard_cut_card(shoe)
+    shoe.cards.shift
+  end
 end
 
 class Shoe
   DECK_COUNT = 4
-  CUT_CARD = "\u{1F0A0}"
+  CUT_CARD = "\u{1F0DF}"
 
   attr_reader :cards
 
@@ -158,6 +162,10 @@ class Shoe
 
   def deal
     cards.shift
+  end
+
+  def cut_card_next?
+    @cards.first.value == CUT_CARD
   end
 
   private
@@ -301,7 +309,7 @@ class Game
   TWENTY_ONE_PAYOUT = 3.0/2.0
   CUT_CARD_MESSAGE = 'Cut card. Last hand before shuffle.'
 
-  attr_reader :shoe, :human, :dealer, :current_player, :cut_card
+  attr_reader :shoe, :human, :dealer, :current_player
 
   def initialize
     @human = Player.new
@@ -494,12 +502,13 @@ class Game
 
   def deal_card
     sleep(0.5)
-    card = dealer.deal(shoe)
 
-    if cut_card?(card)
-      card = dealer.deal(shoe)
+    if shoe.cut_card_next?
+      dealer.discard_cut_card(shoe)
       @cut_card_message = CUT_CARD_MESSAGE
     end
+
+    card = dealer.deal(shoe)
 
     case current_player
     when human.name
@@ -607,10 +616,6 @@ class Game
 
   def valid_bet?(bet)
     bet >= MIN_BET && human.wallet >= bet
-  end
-
-  def cut_card?(card)
-    card.value == Shoe::CUT_CARD && !cut_card
   end
 
   def shoe_nearly_empty?
