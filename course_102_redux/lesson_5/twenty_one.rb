@@ -417,6 +417,7 @@ class Game
     bet = nil
     loop do
       puts 'Place your bet?'
+      print Wallet::CURRENCY
       bet = gets.chomp.to_f
       break if valid_bet?(bet)
       display_invalid_bet_message(bet)
