@@ -135,10 +135,6 @@ class Dealer < Participant
   def reveal_hand
     hand.reveal
   end
-
-  def discard_cut_card(shoe)
-    shoe.cards.shift
-  end
 end
 
 class Shoe
@@ -162,10 +158,6 @@ class Shoe
 
   def deal
     cards.shift
-  end
-
-  def cut_card_next?
-    @cards.first.value == CUT_CARD
   end
 
   private
@@ -211,6 +203,7 @@ end
 
 class Card
   DOWN_CARD = "\u{1F0A0}"
+  CUT_CARD = "\u{1F0DF}"
   UP_STATE = 'up'
   DOWN_STATE = 'down'
 
@@ -237,6 +230,10 @@ class Card
 
   def face_down?
     state == DOWN_STATE
+  end
+
+  def cut_card?
+    value == CUT_CARD
   end
 end
 
@@ -500,16 +497,18 @@ class Game
     end
   end
 
-  def deal_card
-    sleep(0.5)
-
-    if shoe.cut_card_next?
-      dealer.discard_cut_card(shoe)
+  def next_card
+    card = dealer.deal(shoe)
+    if card.cut_card?
+      card = next_card
       @cut_card_message = CUT_CARD_MESSAGE
     end
+    card
+  end
 
-    card = dealer.deal(shoe)
-
+  def deal_card
+    sleep(0.5)
+    card = next_card
     case current_player
     when human.name
       human.hit(card)
