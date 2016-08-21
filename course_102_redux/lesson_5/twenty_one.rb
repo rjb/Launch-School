@@ -18,7 +18,7 @@ class Wallet
 
   attr_accessor :value
 
-  def initialize(value = 10)
+  def initialize(value = 100)
     @value = value
   end
 
