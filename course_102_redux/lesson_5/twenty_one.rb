@@ -48,7 +48,7 @@ class Wallet
 end
 
 class Participant
-  attr_accessor :hand, :name
+  attr_accessor :hand, :name, :message
 
   def initialize
     set_name
@@ -298,6 +298,10 @@ class Hand
   end
 end
 
+class Table
+  SEATS = 5
+end
+
 class Game
   include Currency
 
@@ -306,43 +310,72 @@ class Game
   TWENTY_ONE_PAYOUT = 3.0/2.0
   CUT_CARD_MESSAGE = 'Cut card. Last hand before shuffle.'
 
-  attr_reader :shoe, :human, :dealer, :current_player
+  attr_reader :players, :shoe, :dealer
 
   def initialize
-    @human = Player.new
+    @players = []
     @dealer = Dealer.new
+    initialize_players
+  end
+
+  def get_player_count
+    count = nil
+    loop do
+      puts "How many players? (1-#{Table::SEATS})"
+      count = gets.chomp.to_i
+      break if (1..Table::SEATS).include?(count)
+      puts "Enter a valid number, between 1 and #{Table::SEATS}."
+    end
+    count
   end
 
   def start
     reset_shoe
 
     loop do
-      set_action
+      reset_messages
       clear_table
-      withraw_bid
+      place_bets
+      withraw_bids
 
       1.times do
         deal_initial_cards
-        break if human.twenty_one?
-
-        player_turn
-        break if human.busted?
-
-        dealer_turn
+        twenty_one?
+        players_turns
+        dealers_turn
       end
 
-      award_winner
-      show_result
+      award_winners
+      show_results
+      boot_broke_players
+      cash_out_players?
 
-      break if wallet_empty? || cash_out?
+      break if table_empty?
 
-      clear_table_and_reset_shoe if shoe_nearly_empty?
+      reset_shoe if shoe_nearly_empty?
     end
 
-    cash_out
+    close_table
   end
 
   private
+
+  def reset_messages
+    players.each { |player| player.message = nil }
+    dealer.message = nil
+  end
+
+  def table_empty?
+    players.empty?
+  end
+
+  def initialize_players
+    count = get_player_count
+    count.times do |i|
+      print "Player #{i + 1}: "
+      @players << Player.new
+    end
+  end
 
   def reset_shoe
     @shoe = Shoe.new
@@ -352,9 +385,10 @@ class Game
     display_table
   end
 
-  def clear_table_and_reset_shoe
-    clear_table
-    reset_shoe
+  def display_message(msg)
+    puts msg
+    sleep(3)
+    display_table
   end
 
   def display_shuffling_deck
@@ -387,13 +421,22 @@ class Game
     puts shoe_cards.join(' ')
   end
 
+  # Add sleep parameter and make default 0.5
   def display_table
     system 'clear'
     display_game_message
     puts '-----------------------------'
     block_given? ? yield : display_shoe
     puts '-----------------------------'
-    show_hands
+    show_dealers_hand
+    puts
+    # show_players_hands
+    players.each do |player|
+      puts "#{player.name} #{player.wallet}"
+      puts "#{player.hand} #{player.message}"
+      puts
+    end
+
     puts '-----------------------------'
   end
 
@@ -413,29 +456,26 @@ class Game
     puts 'Goodbye!'
   end
 
-  def set_bet
-    bet = nil
-    loop do
-      puts 'Place your bet?'
-      print Wallet::CURRENCY
-      bet = gets.chomp.to_f
-      break if valid_bet?(bet)
-      display_invalid_bet_message(bet)
-    end
-    human.bet = bet
-  end
-
-  def set_action
-    loop do
-      set_bet
-      puts 'Change bet (c) or deal (d)'
-      break if gets.chomp.downcase.start_with?('d')
+  # Table should show bet amount deducted from wallet after player submits amount
+  def place_bets
+    players.each do |player|
+      # place_bet
+      # withdraw_bet
+      bet = nil
+      loop do
+        puts "#{player.name}: Place your bet."
+        print Wallet::CURRENCY
+        bet = gets.chomp.to_f
+        break if valid_bet?(player, bet)
+        display_invalid_bet_message(player, bet)
+      end
+      player.bet = bet
     end
   end
 
-  def display_invalid_bet_message(bet)
+  def display_invalid_bet_message(player, bet)
     puts 'Bet is too low.' if bet < MIN_BET
-    puts "You're wallet is a little light." if human.wallet < bet
+    puts "You're wallet is a little light." if player.wallet < bet
   end
 
   def display_game_message
@@ -447,20 +487,9 @@ class Game
     display_table
   end
 
-  def show_hands
-    show_dealers_hand
-    puts
-    show_humans_hand
-  end
-
-  def show_humans_hand
-    puts "#{human.name} #{human.wallet}"
-    puts "(#{human.total}): #{human.hand}"
-  end
-
   def show_dealers_hand
     puts "#{dealer.name}"
-    puts "(#{dealer.total}): #{dealer.hand}"
+    puts "#{dealer.hand} #{dealer.message}"
   end
 
   def shuffle_deck
@@ -469,33 +498,72 @@ class Game
   end
 
   def clear_table
-    human.clear_hand
+    clear_players_hands
+    clear_dealers_hand
+    display_table
+  end
+
+  def clear_players_hands
+    players.each { |player| player.clear_hand }
+  end
+
+  def clear_dealers_hand
     dealer.clear_hand
-    @current_player = human.name
   end
 
-  def player_turn
-    loop do
-      puts 'Hit (h) or stand (s)?'
-      break unless gets.chomp.downcase == 'h'
-      deal_card
-      break if human.busted?
+  def active_players
+    players.select { |p| !p.twenty_one? }
+  end
+
+  def players_turns
+    active_players.each do |player|
+      loop do
+        puts "#{player.name}: Hit (h) or stand (s)?"
+        break unless gets.chomp.downcase == 'h'
+        deal_card(player)
+        if player.busted?
+          player.message = 'Busted!'
+          display_table
+          break
+        end
+      end
     end
-    alternate_player
   end
 
-  def dealer_turn
+  def all_twenty_one?
+    players.all?(&:twenty_one?)
+  end
+
+  def all_busted?
+    players.all?(&:busted?)
+  end
+
+  def dealers_turn
     reveal_dealers_hand
-    while dealer.total < Dealer::HIT_MINIMUM
-      deal_card
+    unless all_twenty_one? || all_busted?
+      while dealer.total < Dealer::HIT_MINIMUM
+        deal_card(dealer)
+      end
+      if dealer.busted?
+        dealer.message = 'Busted!'
+        display_table
+      end
     end
   end
 
   def deal_initial_cards
-    4.times do
-      deal_card
-      alternate_player
+    2.times do
+      players.each { |player| deal_card(player) }
+      deal_card(dealer, dealer.hand_empty?)
     end
+  end
+
+  def deal_card(player, flip = false)
+    card = next_card
+    card.flip if flip
+    player.hit(card)
+    sleep(0.5)
+    display_table
   end
 
   def next_card
@@ -507,115 +575,107 @@ class Game
     card
   end
 
-  def deal_card
-    sleep(0.5)
-    card = next_card
-    case current_player
-    when human.name
-      human.hit(card)
-    when dealer.name
-      card.flip if dealer.hand_empty?
-      dealer.hit(card)
-    end
+  def show_results
+    display_table
+    players.each { |player| show_result(player) }
+  end
+
+  def show_result(player)
+    player.message =
+      if player.twenty_one?
+        'Twenty-One!'
+      elsif player.busted?
+        'Busted!'
+      elsif dealer.busted? || player_won?(player)
+        'Winner!'
+      elsif dealer_won?(player)
+        "#{dealer.name} won."
+      elsif draw?(player)
+        'Draw.'
+      end
     display_table
   end
 
-  def alternate_player
-    case current_player
-    when human.name
-      @current_player = dealer.name
-    when dealer.name
-      @current_player = human.name
-    end
-  end
-
-  def show_result
-    display_table
-    display_busted_message
-    display_twenty_one_message
-    display_winner_message if someone_won?
-    display_draw_message if draw?
-  end
-
-  def display_busted_message
-    if human.busted?
-      puts 'You busted.'
-    elsif dealer.busted?
-      puts 'Dealer busted.'
-    end
-  end
-
-  def display_twenty_one_message
-    puts '21!' if human.twenty_one?
-  end
-
-  def display_winner_message
-    case winner
-    when human
-      puts "You win!"
-    when dealer
-      puts 'House wins.'
-    end
-  end
-
-  def display_draw_message
-    puts 'Draw.' if draw?
-  end
-
-  def winner
-    if human.busted?
+  def winner(player)
+    if player.busted?
       dealer
     elsif dealer.busted?
-      human
-    elsif human > dealer
-      human
-    elsif dealer > human
+      player
+    elsif player > dealer
+      player
+    elsif dealer > player
       dealer
     end
   end
 
-  def someone_won?
-    !!winner
+  def player_won?(player)
+    winner(player) == player
   end
 
-  def human_won?
-    winner == human
+  def dealer_won?(player)
+    winner(player) == dealer
   end
 
-  def draw?
-    human == dealer
+  def draw?(player)
+    player == dealer
   end
 
-  def award_winner
-    if human.twenty_one?
-      human.wallet.deposit(((TWENTY_ONE_PAYOUT) * human.bet) + human.bet)
-    elsif human_won?
-      human.wallet.deposit(((STANDARD_PAYOUT) * human.bet) + human.bet)
-    elsif draw?
-      human.wallet.deposit(human.bet) if draw?
+  def award_winners
+    players.each do |player|
+      if player.twenty_one?
+        player.wallet.deposit(((TWENTY_ONE_PAYOUT) * player.bet) + player.bet)
+      elsif player_won?(player)
+        player.wallet.deposit(((STANDARD_PAYOUT) * player.bet) + player.bet)
+      elsif draw?(player)
+        player.wallet.deposit(player.bet)
+      end
     end
   end
 
-  def withraw_bid
-    human.wallet.withdraw(human.bet)
+  def withraw_bids
+    players.each { |player| player.wallet.withdraw(player.bet) }
   end
 
-  def cash_out
-    display_cash_out_message
-    display_goodbye_message
+  def boot_broke_players
+    broke_players = players.select { |player| player.wallet.empty? }
+    broke_players.each do |player|
+      players.delete(player)
+      display_message "#{player.name}: You're out of cash. Goodbye."
+    end
   end
 
-  def cash_out?
-    puts 'Play another hand <enter> or cash out ($)?'
+  def close_table
+    clear_table
+    puts 'Table closed.'
+  end
+
+  def twenty_one?
+    players.select(&:twenty_one?).each do |player|
+      player.message = 'Twenty-One!'
+      display_table
+    end
+  end
+
+  def cash_out_players?
+    Array.new(players).each do |player|
+      if cash_out?(player)
+        players.delete(player)
+        display_message "#{player.name}: Here's your #{player.wallet}. Goodbye."
+      end
+    end
+  end
+
+  def cash_out?(player)
+    puts "#{player.name}: Play another hand <enter> or cash out ($)?"
     gets.chomp.start_with?('$')
   end
 
-  def wallet_empty?
-    human.wallet.empty?
+  def wallet_empty?(player)
+    player.wallet.empty?
   end
 
-  def valid_bet?(bet)
-    bet >= MIN_BET && human.wallet >= bet
+  def valid_bet?(player, bet)
+    bet >= MIN_BET && player.wallet >= bet
   end
 
   def shoe_nearly_empty?
