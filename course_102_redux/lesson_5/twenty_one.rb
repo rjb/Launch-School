@@ -15,10 +15,11 @@ class Wallet
   include Currency
 
   CURRENCY = CURRENCIES['US']
+  DEFAULT_VALUE = 100
 
   attr_accessor :value
 
-  def initialize(value = 100)
+  def initialize(value = DEFAULT_VALUE)
     @value = value
   end
 
@@ -31,19 +32,19 @@ class Wallet
   end
 
   def <(amount)
-    self.value < amount
+    value < amount
   end
 
   def >=(amount)
-    self.value >= amount
+    value >= amount
   end
 
   def to_s
-    "#{format_as_currency(value)}"
+    format_as_currency(value)
   end
 
   def empty?
-    self.value == 0
+    value == 0
   end
 end
 
@@ -106,10 +107,6 @@ class Player < Participant
       puts 'Invalid name.'
     end
     self.name = n
-  end
-
-  def bet_made?
-    !!bet
   end
 end
 
@@ -245,32 +242,32 @@ class Hand
   end
 
   def <<(card)
-    @cards << card
+    self.cards << card
   end
 
   def total
-    total = 0
+    hand_total = 0
     values = cards.select(&:face_up?).map { |card| card.value[0] }
 
     values.each do |value|
       if value == 'A'
-        total += 11
+        hand_total += 11
       elsif %w(J K Q).include?(value)
-        total += 10
+        hand_total += 10
       else
-        total += value.to_i
+        hand_total += value.to_i
       end
     end
 
     values.count('A').times do
-      total -= 10 if total > 21
+      hand_total -= 10 if hand_total > 21
     end
 
-    total
+    hand_total
   end
 
   def reveal
-    self.cards.each { |card| card.flip if card.face_down? }
+    cards.each { |card| card.flip if card.face_down? }
   end
 
   def count
@@ -282,11 +279,11 @@ class Hand
   end
 
   def twenty_one?
-    self.total == 21
+    total == 21
   end
 
   def busted?
-    self.total > 21
+    total > 21
   end
 
   def two_cards?
@@ -333,25 +330,19 @@ class Game
     reset_shoe
 
     loop do
-      reset_messages
-      clear_table
+      initialize_table
       place_bets
-      withraw_bids
 
-      1.times do
-        deal_initial_cards
-        twenty_one?
-        players_turns
-        dealers_turn
-      end
-
+      deal_initial_cards
+      twenty_one?
+      players_turns
+      dealers_turn
       award_winners
       show_results
       boot_broke_players
       cash_out_players?
 
       break if table_empty?
-
       reset_shoe if shoe_nearly_empty?
     end
 
@@ -359,6 +350,11 @@ class Game
   end
 
   private
+
+  def initialize_table
+    reset_messages
+    clear_table
+  end
 
   def reset_messages
     players.each { |player| player.message = nil }
@@ -459,18 +455,25 @@ class Game
   # Table should show bet amount deducted from wallet after player submits amount
   def place_bets
     players.each do |player|
-      # place_bet
-      # withdraw_bet
-      bet = nil
-      loop do
-        puts "#{player.name}: Place your bet."
-        print Wallet::CURRENCY
-        bet = gets.chomp.to_f
-        break if valid_bet?(player, bet)
-        display_invalid_bet_message(player, bet)
-      end
-      player.bet = bet
+      place_bet(player)
+      withdraw_bet(player)
     end
+  end
+
+  def place_bet(player)
+    bet = nil
+    loop do
+      puts "#{player.name}: Place your bet."
+      print Wallet::CURRENCY
+      bet = gets.chomp.to_f
+      break if valid_bet?(player, bet)
+      display_invalid_bet_message(player, bet)
+    end
+    player.bet = bet
+  end
+
+  def withdraw_bet(player)
+    player.wallet.withdraw(player.bet)
   end
 
   def display_invalid_bet_message(player, bet)
@@ -630,10 +633,6 @@ class Game
         player.wallet.deposit(player.bet)
       end
     end
-  end
-
-  def withraw_bids
-    players.each { |player| player.wallet.withdraw(player.bet) }
   end
 
   def boot_broke_players
