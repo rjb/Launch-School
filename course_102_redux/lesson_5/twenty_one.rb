@@ -492,6 +492,7 @@ class Game
     players.each do |player|
       puts "#{player.name} #{player.wallet}"
       puts "#{player.hand} #{player.message}"
+      puts
     end
   end
 
@@ -656,9 +657,9 @@ class Game
   end
 
   def cash_out_players?
-    Array.new(players).each_with_index do |player, i|
+    Array.new(players).each do |player|
       if cash_out?(player)
-        players.delete_at(i)
+        players.delete(player)
         display_message "#{player.name}: Here's your #{player.wallet}. Goodbye."
       end
     end
