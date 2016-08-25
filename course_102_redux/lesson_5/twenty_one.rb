@@ -68,12 +68,12 @@ class Participant
     hand.total
   end
 
-  def >(other_player)
-    self.total > other_player.total
+  def >(other_participant)
+    total > other_participant.total
   end
 
-  def ==(other_player)
-    total == other_player.total
+  def ==(other_participant)
+    total == other_participant.total
   end
 
   def hand_empty?
@@ -136,7 +136,6 @@ end
 
 class Shoe
   DECK_COUNT = 4
-  CUT_CARD = "\u{1F0DF}"
 
   attr_reader :cards
 
@@ -150,7 +149,7 @@ class Shoe
   end
 
   def place_cut_card
-    @cards.insert(random_spot, Card.new(CUT_CARD))
+    @cards.insert(random_spot, Card.new(Card::CUT_CARD))
   end
 
   def deal
@@ -425,14 +424,7 @@ class Game
     block_given? ? yield : display_shoe
     puts '-----------------------------'
     show_dealers_hand
-    puts
-    # show_players_hands
-    players.each do |player|
-      puts "#{player.name} #{player.wallet}"
-      puts "#{player.hand} #{player.message}"
-      puts
-    end
-
+    show_players_hands
     puts '-----------------------------'
   end
 
@@ -493,6 +485,14 @@ class Game
   def show_dealers_hand
     puts "#{dealer.name}"
     puts "#{dealer.hand} #{dealer.message}"
+    puts
+  end
+
+  def show_players_hands
+    players.each do |player|
+      puts "#{player.name} #{player.wallet}"
+      puts "#{player.hand} #{player.message}"
+    end
   end
 
   def shuffle_deck
@@ -656,9 +656,9 @@ class Game
   end
 
   def cash_out_players?
-    Array.new(players).each do |player|
+    Array.new(players).each_with_index do |player, i|
       if cash_out?(player)
-        players.delete(player)
+        players.delete_at(i)
         display_message "#{player.name}: Here's your #{player.wallet}. Goodbye."
       end
     end
