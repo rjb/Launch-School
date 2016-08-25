@@ -339,7 +339,7 @@ class Game
       award_winners
       show_results
       boot_broke_players
-      cash_out_players?
+      cash_out_players
 
       break if table_empty?
       reset_shoe if shoe_nearly_empty?
@@ -656,18 +656,13 @@ class Game
     end
   end
 
-  def cash_out_players?
-    Array.new(players).each do |player|
-      if cash_out?(player)
-        players.delete(player)
-        display_message "#{player.name}: Here's your #{player.wallet}. Goodbye."
-      end
-    end
+  def cash_out_players
+    @players.select! { |player| play_again?(player) }
   end
 
-  def cash_out?(player)
+  def play_again?(player)
     puts "#{player.name}: Play another hand <enter> or cash out ($)?"
-    gets.chomp.start_with?('$')
+    !gets.chomp.start_with?('$')
   end
 
   def wallet_empty?(player)
@@ -683,4 +678,4 @@ class Game
   end
 end
 
-game = Game.new.start
+Game.new.start
