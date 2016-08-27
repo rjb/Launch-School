@@ -657,12 +657,16 @@ class Game
   end
 
   def cash_out_players
-    @players.select! { |player| play_again?(player) }
+    cashout_p = players.select { |player| cash_out?(player) }
+    cashout_p.each do |player|
+      @players.delete(player)
+      display_message "#{player.name}: Here's your #{player.wallet}. Goodbye."
+    end
   end
 
-  def play_again?(player)
+  def cash_out?(player)
     puts "#{player.name}: Play another hand <enter> or cash out ($)?"
-    !gets.chomp.start_with?('$')
+    gets.chomp.start_with?('$')
   end
 
   def wallet_empty?(player)
