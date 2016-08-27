@@ -108,6 +108,14 @@ class Player < Participant
     end
     self.name = n
   end
+
+  def reset_bet
+    self.bet = nil
+  end
+
+  def made_bet?
+    !!bet
+  end
 end
 
 class Dealer < Participant
@@ -352,7 +360,12 @@ class Game
 
   def initialize_table
     reset_messages
+    reset_bets
     clear_table
+  end
+
+  def reset_bets
+    players.each { |player| player.reset_bet }
   end
 
   def reset_messages
@@ -416,7 +429,6 @@ class Game
     puts shoe_cards.join(' ')
   end
 
-  # Add sleep parameter and make default 0.5
   def display_table
     system 'clear'
     display_game_message
@@ -490,10 +502,24 @@ class Game
 
   def show_players_hands
     players.each do |player|
-      puts "#{player.name} #{player.wallet}"
-      puts "#{player.hand} #{player.message}"
+      puts "#{player.name} #{show_wallet(player)} #{show_bet(player)}"
+      puts "#{show_total(player)} #{player.hand} #{player.message}"
       puts
     end
+  end
+
+  def show_total(player)
+    unless player.hand_empty?
+      "(#{player.total})"
+    end
+  end
+
+  def show_wallet(player)
+    "| #{player.wallet}"
+  end
+
+  def show_bet(player)
+    player.made_bet? ? "| Bet: #{format_as_currency(player.bet)}" : ''
   end
 
   def shuffle_deck
