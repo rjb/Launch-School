@@ -7,7 +7,7 @@ module Currency
   }
 
   def format_as_currency(amount)
-    "#{Wallet::CURRENCY}%.2f" % amount
+    format "#{Wallet::CURRENCY}%.2f", amount
   end
 end
 
@@ -31,12 +31,12 @@ class Wallet
     self.value -= amount unless amount > value
   end
 
-  def <(amount)
-    value < amount
+  def <(other)
+    value < other
   end
 
-  def >=(amount)
-    value >= amount
+  def >=(other)
+    value >= other
   end
 
   def to_s
@@ -61,19 +61,23 @@ class Participant
   end
 
   def hit(card)
-    self.hand << card
+    hand << card
   end
 
   def total
     hand.total
   end
 
-  def >(other_participant)
-    total > other_participant.total
+  def reset_message
+    self.message = nil
   end
 
-  def ==(other_participant)
-    total == other_participant.total
+  def >(other)
+    total > other.total
+  end
+
+  def ==(other)
+    total == other.total
   end
 
   def hand_empty?
@@ -114,7 +118,7 @@ class Player < Participant
   end
 
   def made_bet?
-    !!bet
+    !bet.nil?
   end
 end
 
@@ -228,6 +232,10 @@ class Card
     self
   end
 
+  def rank
+    value.first
+  end
+
   def face_up?
     state == UP_STATE
   end
@@ -249,28 +257,13 @@ class Hand
   end
 
   def <<(card)
-    self.cards << card
+    cards << card
   end
 
   def total
-    hand_total = 0
-    values = cards.select(&:face_up?).map { |card| card.value[0] }
-
-    values.each do |value|
-      if value == 'A'
-        hand_total += 11
-      elsif %w(J K Q).include?(value)
-        hand_total += 10
-      else
-        hand_total += value.to_i
-      end
-    end
-
-    values.count('A').times do
-      hand_total -= 10 if hand_total > 21
-    end
-
-    hand_total
+    result = ranks.map { |rank| value(rank) }.reduce(&:+)
+    ranks.count('A').times { result -= 10 if result > 21 }
+    result
   end
 
   def reveal
@@ -300,6 +293,22 @@ class Hand
   def empty?
     count == 0
   end
+
+  private
+
+  def ranks
+    cards.select(&:face_up?).map(&:rank)
+  end
+
+  def value(rank)
+    if rank == 'A'
+      11
+    elsif %w(J K Q).include?(rank)
+      10
+    else
+      rank.to_i
+    end
+  end
 end
 
 class Table
@@ -310,8 +319,8 @@ class Game
   include Currency
 
   MIN_BET = 1
-  STANDARD_PAYOUT = 1/1
-  TWENTY_ONE_PAYOUT = 3.0/2.0
+  STANDARD_PAYOUT = 1 / 1
+  TWENTY_ONE_PAYOUT = 3.0 / 2.0
   CUT_CARD_MESSAGE = 'Cut card. Last hand before shuffle.'
 
   attr_reader :players, :shoe, :dealer
@@ -322,7 +331,7 @@ class Game
     initialize_players
   end
 
-  def get_player_count
+  def player_count
     count = nil
     loop do
       puts "How many players? (1-#{Table::SEATS})"
@@ -360,17 +369,13 @@ class Game
 
   def initialize_table
     reset_messages
-    reset_bets
+    players.each(&:reset_bet)
     clear_table
   end
 
-  def reset_bets
-    players.each { |player| player.reset_bet }
-  end
-
   def reset_messages
-    players.each { |player| player.message = nil }
-    dealer.message = nil
+    players.each(&:reset_message)
+    dealer.reset_message
   end
 
   def table_empty?
@@ -378,7 +383,7 @@ class Game
   end
 
   def initialize_players
-    count = get_player_count
+    count = player_count
     count.times do |i|
       print "Player #{i + 1}: "
       @players << Player.new
@@ -456,7 +461,6 @@ class Game
     puts 'Goodbye!'
   end
 
-  # Table should show bet amount deducted from wallet after player submits amount
   def place_bets
     players.each do |player|
       place_bet(player)
@@ -509,9 +513,7 @@ class Game
   end
 
   def show_total(player)
-    unless player.hand_empty?
-      "(#{player.total})"
-    end
+    "(#{player.total})" unless player.hand_empty?
   end
 
   def show_wallet(player)
@@ -528,17 +530,9 @@ class Game
   end
 
   def clear_table
-    clear_players_hands
-    clear_dealers_hand
-    display_table
-  end
-
-  def clear_players_hands
-    players.each { |player| player.clear_hand }
-  end
-
-  def clear_dealers_hand
+    players.each(&:clear_hand)
     dealer.clear_hand
+    display_table
   end
 
   def active_players
@@ -560,22 +554,13 @@ class Game
     end
   end
 
-  def all_twenty_one?
-    players.all?(&:twenty_one?)
-  end
-
-  def all_busted?
-    players.all?(&:busted?)
-  end
-
   def dealers_turn
     reveal_dealers_hand
-    unless all_twenty_one? || all_busted?
-      deal_card(dealer) while dealer.total < Dealer::HIT_MINIMUM
-      if dealer.busted?
-        dealer.message = 'Busted!'
-        display_table
-      end
+    return if players.all?(&:twenty_one?) || players.all?(&:busted?)
+    deal_card(dealer) while dealer.total < Dealer::HIT_MINIMUM
+    if dealer.busted?
+      dealer.message = 'Busted!'
+      display_table
     end
   end
 
