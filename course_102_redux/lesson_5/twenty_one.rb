@@ -571,9 +571,7 @@ class Game
   def dealers_turn
     reveal_dealers_hand
     unless all_twenty_one? || all_busted?
-      while dealer.total < Dealer::HIT_MINIMUM
-        deal_card(dealer)
-      end
+      deal_card(dealer) while dealer.total < Dealer::HIT_MINIMUM
       if dealer.busted?
         dealer.message = 'Busted!'
         display_table
@@ -606,8 +604,8 @@ class Game
   end
 
   def show_results
-    display_table
     players.each { |player| show_result(player) }
+    display_table
   end
 
   def show_result(player)
