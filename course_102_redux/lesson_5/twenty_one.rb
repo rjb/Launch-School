@@ -612,18 +612,25 @@ class Game
 
   def show_result(player)
     player.message =
-      if player.twenty_one?
-        'Twenty-One!'
-      elsif player.busted?
-        'Busted!'
-      elsif dealer.busted? || player_won?(player)
-        'Winner!'
+      if player_won?(player)
+        won_message(player)
       elsif dealer_won?(player)
-        "#{dealer.name} won."
-      elsif draw?(player)
-        'Draw.'
+        lost_message(player)
+      else
+        draw_message
       end
-    display_table
+  end
+
+  def won_message(player)
+    player.twenty_one? ? 'Twenty-One!' : 'Winner!'
+  end
+
+  def lost_message(player)
+    player.busted? ? 'Busted!' : "#{table.dealer.name} won"
+  end
+
+  def draw_message
+    'Draw.'
   end
 
   def winner(player)
