@@ -683,11 +683,7 @@ class Game
   end
 
   def cash_out_players
-    cashout_p = players.select { |player| cash_out?(player) }
-    cashout_p.each do |player|
-      players.delete(player)
-      display_message "#{player.name}: Here's your #{player.wallet}. Goodbye."
-    end
+    players.delete_if { |player| cash_out?(player) }
   end
 
   def cash_out?(player)
