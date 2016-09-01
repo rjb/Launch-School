@@ -626,7 +626,7 @@ class Game
   end
 
   def lost_message(player)
-    player.busted? ? 'Busted!' : "#{table.dealer.name} won"
+    player.busted? ? 'Busted!' : "#{dealer.name} won"
   end
 
   def draw_message
