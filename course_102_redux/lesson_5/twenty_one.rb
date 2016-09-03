@@ -1,3 +1,4 @@
+# Money related actions
 module Currency
   CURRENCIES = {
     'US' => '$',
@@ -11,6 +12,7 @@ module Currency
   end
 end
 
+# Player's wallets
 class Wallet
   include Currency
 
@@ -48,6 +50,7 @@ class Wallet
   end
 end
 
+# Parent class for player and dealer objects
 class Participant
   attr_accessor :hand, :name, :message
 
@@ -93,6 +96,7 @@ class Participant
   end
 end
 
+# 
 class Player < Participant
   attr_accessor :bet
   attr_reader :wallet
@@ -122,6 +126,7 @@ class Player < Participant
   end
 end
 
+# 
 class Dealer < Participant
   HIT_MINIMUM = 17
   NAMES = [
@@ -146,6 +151,7 @@ class Dealer < Participant
   end
 end
 
+# Holds decks of cards from which cards are delt
 class Shoe
   DECK_COUNT = 4
 
@@ -153,10 +159,17 @@ class Shoe
 
   def initialize
     @cards = []
-    initialize_cards
+    reset
   end
 
-  def shuffle
+  def reset
+    cards.clear
+    load_cards
+    shuffle_cards
+    place_cut_card
+  end
+
+  def shuffle_cards
     cards.shuffle!
   end
 
@@ -170,7 +183,7 @@ class Shoe
 
   private
 
-  def initialize_cards
+  def load_cards
     DECK_COUNT.times { @cards.push(*Deck.new.cards) }
   end
 
@@ -183,6 +196,7 @@ class Shoe
   end
 end
 
+# Standard deck of playing cards
 class Deck
   SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"]
   RANKS = ('2'..'10').to_a + %w(J Q K A)
@@ -209,6 +223,7 @@ class Deck
   end
 end
 
+# Generica class for creating cards with any value
 class Card
   DOWN_CARD = "\u{1F0A0}"
   CUT_CARD = "\u{1F0DF}"
@@ -249,6 +264,7 @@ class Card
   end
 end
 
+# A collection of cards given to a participant
 class Hand
   attr_reader :cards
 
@@ -328,6 +344,7 @@ class Game
   def initialize
     @players = []
     @dealer = Dealer.new
+    @shoe = Shoe.new
     initialize_players
   end
 
@@ -391,11 +408,9 @@ class Game
   end
 
   def reset_shoe
-    @shoe = Shoe.new
+    shoe.reset
     @cut_card_message = nil
-    shuffle_deck
-    shoe.place_cut_card
-    display_table
+    display_shuffling_deck
   end
 
   def display_message(msg)
@@ -540,16 +555,18 @@ class Game
   end
 
   def players_turns
-    active_players.each do |player|
-      loop do
-        puts "#{player.name}: Hit (h) or stand (s)?"
-        break unless gets.chomp.downcase == 'h'
-        deal_card(player)
-        if player.busted?
-          player.message = 'Busted!'
-          display_table
-          break
-        end
+    active_players.each { |player| player_turn(player) }
+  end
+
+  def player_turn(player)
+    loop do
+      puts "#{player.name}: Hit (h) or stand (s)?"
+      break unless gets.chomp.downcase == 'h'
+      deal_card(player)
+      if player.busted?
+        player.message = 'Busted!'
+        display_table
+        break
       end
     end
   end
@@ -643,13 +660,17 @@ class Game
   def award_winners
     players.each do |player|
       if player.twenty_one?
-        player.wallet.deposit(((TWENTY_ONE_PAYOUT) * player.bet) + player.bet)
+        pay(player, TWENTY_ONE_PAYOUT)
       elsif player_won?(player)
-        player.wallet.deposit(((STANDARD_PAYOUT) * player.bet) + player.bet)
+        pay(player, STANDARD_PAYOUT)
       elsif draw?(player)
-        player.wallet.deposit(player.bet)
+        pay(player)
       end
     end
+  end
+
+  def pay(player, payout = 0)
+    player.wallet.deposit(((payout) * player.bet) + player.bet)
   end
 
   def boot_broke_players
