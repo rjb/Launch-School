@@ -12,7 +12,7 @@ module Currency
   end
 end
 
-# Player's wallets
+# Used to hold and keep track of player's money
 class Wallet
   include Currency
 
@@ -96,7 +96,7 @@ class Participant
   end
 end
 
-# 
+# Has wallet
 class Player < Participant
   attr_accessor :bet
   attr_reader :wallet
@@ -126,7 +126,7 @@ class Player < Participant
   end
 end
 
-# 
+# Deals cards from shoe
 class Dealer < Participant
   HIT_MINIMUM = 17
   NAMES = [
@@ -151,15 +151,16 @@ class Dealer < Participant
   end
 end
 
-# Holds decks of cards from which cards are delt
+# Holds decks of cards from which cards are dealt
 class Shoe
   DECK_COUNT = 4
+  LOW_CARD_COUNT_MESSAGE = 'Low on cards. Last hand before shuffle.'
+  STATES = { full: 'full', low: 'low' }
 
-  attr_reader :cards
+  attr_reader :cards, :state
 
   def initialize
     @cards = []
-    reset
   end
 
   def reset
@@ -167,6 +168,7 @@ class Shoe
     load_cards
     shuffle_cards
     place_cut_card
+    @state = STATES[:full]
   end
 
   def shuffle_cards
@@ -178,7 +180,23 @@ class Shoe
   end
 
   def deal
-    cards.shift
+    card = cards.shift
+    if card.cut_card?
+      @state = STATES[:low]
+      deal
+    else
+      card
+    end
+  end
+
+  def full?
+    state == STATES[:full]
+  end
+
+  def low?
+    # Maybe track the spot where the cut card was placed,
+    # rather that tracking state
+    state == STATES[:low] || cards.empty?
   end
 
   private
@@ -188,7 +206,7 @@ class Shoe
   end
 
   def random_spot
-    -(size * rand(0.10..0.25))
+    -(size * rand(0.15..0.25))
   end
 
   def size
@@ -223,7 +241,7 @@ class Deck
   end
 end
 
-# Generica class for creating cards with any value
+# Class for creating cards with any value
 class Card
   DOWN_CARD = "\u{1F0A0}"
   CUT_CARD = "\u{1F0DF}"
@@ -327,25 +345,52 @@ class Hand
   end
 end
 
+# Defines table settings
+# Maybe bring all table related objects and actions here?
 class Table
   SEATS = 5
 end
 
+# Logic and rules
 class Game
   include Currency
 
   MIN_BET = 1
   STANDARD_PAYOUT = 1 / 1
   TWENTY_ONE_PAYOUT = 3.0 / 2.0
-  CUT_CARD_MESSAGE = 'Cut card. Last hand before shuffle.'
 
-  attr_reader :players, :shoe, :dealer
+  attr_reader :players, :dealer, :shoe
 
   def initialize
     @players = []
     @dealer = Dealer.new
     @shoe = Shoe.new
     initialize_players
+    initialize_table
+  end
+
+  def start
+    play
+    close_table
+  end
+
+  private
+
+  def play
+    loop do
+      place_bets
+      play_initial_cards
+      play_hand
+      initialize_table
+      break if table_empty?
+    end
+  end
+
+  def initialize_players
+    player_count.times do |i|
+      print "Player #{i + 1}: "
+      @players << Player.new
+    end
   end
 
   def player_count
@@ -359,35 +404,36 @@ class Game
     count
   end
 
-  def start
-    reset_shoe
-
-    loop do
-      initialize_table
-      place_bets
-
-      deal_initial_cards
-      twenty_one?
-      players_turns
-      dealers_turn
-      award_winners
-      show_results
-      boot_broke_players
-      cash_out_players
-
-      break if table_empty?
-      reset_shoe if shoe_nearly_empty?
-    end
-
-    close_table
+  def initialize_table
+    reset_shoe if shoe.low?
+    reset_table
   end
 
-  private
+  def reset_shoe
+    shoe.reset
+    display_shuffling_deck
+  end
 
-  def initialize_table
+  def reset_table
     reset_messages
     players.each(&:reset_bet)
-    clear_table
+    players.each(&:clear_hand)
+    dealer.clear_hand
+    display_table
+  end
+
+  def play_initial_cards
+    deal_initial_cards
+    check_for_twenty_one
+  end
+
+  def play_hand
+    players_turns
+    dealers_turn
+    award_winners
+    show_results
+    boot_broke_players
+    cash_out_players
   end
 
   def reset_messages
@@ -399,20 +445,6 @@ class Game
     players.empty?
   end
 
-  def initialize_players
-    count = player_count
-    count.times do |i|
-      print "Player #{i + 1}: "
-      @players << Player.new
-    end
-  end
-
-  def reset_shoe
-    shoe.reset
-    @cut_card_message = nil
-    display_shuffling_deck
-  end
-
   def display_message(msg)
     puts msg
     sleep(3)
@@ -421,26 +453,25 @@ class Game
 
   def display_shuffling_deck
     cards = []
-    15.times { display_cards_spreading(cards) }
-    15.times { display_cards_shuffling(cards) }
-    15.times { display_cards_spreading(cards) }
+    15.times { display_cards_growing(cards) }
+    15.times { display_cards_shrinking(cards) }
+    15.times { display_cards_growing(cards) }
   end
 
-  def display_cards_spreading(cards)
+  def display_cards_growing(cards)
     cards << Card::DOWN_CARD
     display_table { puts cards.join(' ') }
     sleep(0.05)
   end
 
-  def display_cards_shuffling(cards)
+  def display_cards_shrinking(cards)
     cards.pop
     display_table { puts cards.join(' ') }
     sleep(0.05)
   end
 
   def display_shoe
-    display_cut_card_message
-    display_shoe_cards unless @cut_card_message
+    shoe.low? ? display_low_card_count_message : display_shoe_cards
   end
 
   def display_shoe_cards
@@ -451,7 +482,7 @@ class Game
 
   def display_table
     system 'clear'
-    display_game_message
+    puts game_message
     puts '-----------------------------'
     block_given? ? yield : display_shoe
     puts '-----------------------------'
@@ -460,20 +491,12 @@ class Game
     puts '-----------------------------'
   end
 
-  def display_cut_card_message
-    puts @cut_card_message if @cut_card_message
+  def game_message
+    "Welcome to Twenty-One!\nTable minimum: #{format_as_currency(MIN_BET)}"
   end
 
-  def display_cash_out_message
-    if wallet_empty?
-      puts "You're out of cash."
-    else
-      puts "Here's your #{human.wallet}"
-    end
-  end
-
-  def display_goodbye_message
-    puts 'Goodbye!'
+  def display_low_card_count_message
+    puts Shoe::LOW_CARD_COUNT_MESSAGE
   end
 
   def place_bets
@@ -504,10 +527,6 @@ class Game
     puts "You're wallet is a little light." if player.wallet < bet
   end
 
-  def display_game_message
-    puts "Welcome to Twenty-One!\nTable minimum: #{format_as_currency(MIN_BET)}"
-  end
-
   def reveal_dealers_hand
     dealer.reveal_hand
     display_table
@@ -515,20 +534,24 @@ class Game
 
   def show_dealers_hand
     puts "#{dealer.name}"
-    puts "#{dealer.hand} #{dealer.message}"
+    puts "#{show_total(dealer)} #{dealer.hand} #{show_message(dealer)}"
     puts
   end
 
   def show_players_hands
     players.each do |player|
       puts "#{player.name} #{show_wallet(player)} #{show_bet(player)}"
-      puts "#{show_total(player)} #{player.hand} #{player.message}"
+      puts "#{show_total(player)} #{player.hand} #{show_message(player)}"
       puts
     end
   end
 
-  def show_total(player)
-    "(#{player.total})" unless player.hand_empty?
+  def show_total(participant)
+    "(#{participant.total})" unless participant.hand_empty?
+  end
+
+  def show_message(participant)
+    "- #{participant.message}" if participant.message
   end
 
   def show_wallet(player)
@@ -544,18 +567,15 @@ class Game
     display_shuffling_deck
   end
 
-  def clear_table
-    players.each(&:clear_hand)
-    dealer.clear_hand
-    display_table
-  end
-
   def active_players
     players.select { |p| !p.twenty_one? }
   end
 
   def players_turns
-    active_players.each { |player| player_turn(player) }
+    active_players.each do |player|
+      player_turn(player)
+      bust(player) if player.busted?
+    end
   end
 
   def player_turn(player)
@@ -563,11 +583,7 @@ class Game
       puts "#{player.name}: Hit (h) or stand (s)?"
       break unless gets.chomp.downcase == 'h'
       deal_card(player)
-      if player.busted?
-        player.message = 'Busted!'
-        display_table
-        break
-      end
+      break if player.busted?
     end
   end
 
@@ -575,10 +591,12 @@ class Game
     reveal_dealers_hand
     return if players.all?(&:twenty_one?) || players.all?(&:busted?)
     deal_card(dealer) while dealer.total < Dealer::HIT_MINIMUM
-    if dealer.busted?
-      dealer.message = 'Busted!'
-      display_table
-    end
+    bust(dealer) if dealer.busted?
+  end
+
+  def bust(participant)
+    participant.message = 'Busted!'
+    display_table
   end
 
   def deal_initial_cards
@@ -589,20 +607,11 @@ class Game
   end
 
   def deal_card(player, flip = false)
-    card = next_card
+    card = dealer.deal(shoe)
     card.flip if flip
     player.hit(card)
     sleep(0.5)
     display_table
-  end
-
-  def next_card
-    card = dealer.deal(shoe)
-    if card.cut_card?
-      card = next_card
-      @cut_card_message = CUT_CARD_MESSAGE
-    end
-    card
   end
 
   def show_results
@@ -682,11 +691,11 @@ class Game
   end
 
   def close_table
-    clear_table
+    reset_table
     puts 'Table closed.'
   end
 
-  def twenty_one?
+  def check_for_twenty_one
     players.select(&:twenty_one?).each do |player|
       player.message = 'Twenty-One!'
       display_table
@@ -708,10 +717,6 @@ class Game
 
   def valid_bet?(player, bet)
     bet >= MIN_BET && player.wallet >= bet
-  end
-
-  def shoe_nearly_empty?
-    @cut_card_message
   end
 end
 
