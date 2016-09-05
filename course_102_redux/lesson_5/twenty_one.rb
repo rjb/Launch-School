@@ -1,4 +1,3 @@
-require 'pry'
 # Money related actions
 module Currency
   CURRENCIES = {
