@@ -683,11 +683,14 @@ class Game
   end
 
   def boot_broke_players
-    broke_players = players.select { |player| player.wallet.empty? }
     broke_players.each do |player|
       players.delete(player)
       display_message "#{player.name}: You're out of cash. Goodbye."
     end
+  end
+
+  def broke_players
+    players.select { |player| player.wallet.empty? }
   end
 
   def close_table
