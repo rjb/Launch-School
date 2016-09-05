@@ -416,9 +416,8 @@ class Game
 
   def reset_table
     reset_messages
-    players.each(&:reset_bet)
-    players.each(&:clear_hand)
-    dealer.clear_hand
+    reset_bets
+    reset_hands
     display_table
   end
 
@@ -439,6 +438,15 @@ class Game
   def reset_messages
     players.each(&:reset_message)
     dealer.reset_message
+  end
+
+  def reset_bets
+    players.each(&:reset_bet)
+  end
+
+  def reset_hands
+    players.each(&:clear_hand)
+    dealer.clear_hand
   end
 
   def table_empty?
