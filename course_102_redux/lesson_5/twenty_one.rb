@@ -1,3 +1,4 @@
+require 'pry'
 # Money related actions
 module Currency
   CURRENCIES = {
@@ -155,9 +156,8 @@ end
 class Shoe
   DECK_COUNT = 4
   LOW_CARD_COUNT_MESSAGE = 'Low on cards. Last hand before shuffle.'
-  STATES = { full: 'full', low: 'low' }
 
-  attr_reader :cards, :state
+  attr_reader :cards, :cut_spot
 
   def initialize
     @cards = []
@@ -168,7 +168,6 @@ class Shoe
     load_cards
     shuffle_cards
     place_cut_card
-    @state = STATES[:full]
   end
 
   def shuffle_cards
@@ -176,27 +175,15 @@ class Shoe
   end
 
   def place_cut_card
-    @cards.insert(random_spot, Card.new(Card::CUT_CARD))
+    @cut_spot = random_spot
   end
 
   def deal
-    card = cards.shift
-    if card.cut_card?
-      @state = STATES[:low]
-      deal
-    else
-      card
-    end
-  end
-
-  def full?
-    state == STATES[:full]
+    cards.shift
   end
 
   def low?
-    # Maybe track the spot where the cut card was placed,
-    # rather that tracking state
-    state == STATES[:low] || cards.empty?
+    cards.empty? || cut_card_hit?
   end
 
   private
@@ -206,11 +193,15 @@ class Shoe
   end
 
   def random_spot
-    -(size * rand(0.15..0.25))
+    (size * rand(0.15..0.25)).to_i
   end
 
   def size
     cards.length
+  end
+
+  def cut_card_hit?
+    cut_spot.nil? ? true : size <= cut_spot
   end
 end
 
