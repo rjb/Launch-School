@@ -711,10 +711,6 @@ class Game
     gets.chomp.start_with?('$')
   end
 
-  def wallet_empty?(player)
-    player.wallet.empty?
-  end
-
   def valid_bet?(player, bet)
     bet >= MIN_BET && player.wallet >= bet
   end
