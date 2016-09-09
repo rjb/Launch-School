@@ -335,19 +335,17 @@ class Hand
   end
 end
 
-# Defines table settings
-# Maybe bring all table related objects and actions here?
-class Table
+module Rules
   SEATS = 5
+  MIN_BET = 1
+  STANDARD_PAYOUT = 1 / 1
+  TWENTY_ONE_PAYOUT = 3.0 / 2.0
 end
 
 # Logic and rules
 class Game
+  include Rules
   include Currency
-
-  MIN_BET = 1
-  STANDARD_PAYOUT = 1 / 1
-  TWENTY_ONE_PAYOUT = 3.0 / 2.0
 
   attr_reader :players, :dealer, :shoe
 
@@ -386,10 +384,10 @@ class Game
   def player_count
     count = nil
     loop do
-      puts "How many players? (1-#{Table::SEATS})"
+      puts "How many players? (1-#{SEATS})"
       count = gets.chomp.to_i
-      break if (1..Table::SEATS).include?(count)
-      puts "Enter a valid number, between 1 and #{Table::SEATS}."
+      break if (1..SEATS).include?(count)
+      puts "Enter a valid number, between 1 and #{SEATS}."
     end
     count
   end
@@ -604,20 +602,25 @@ class Game
     end
   end
 
-  def deal_card(player, flip = false)
+  def deal_card(participant, flip = false)
     card = dealer.deal(shoe)
     card.flip if flip
-    player.hit(card)
+    participant.hit(card)
     sleep(0.5)
     display_table
   end
 
   def show_results
-    players.each { |player| show_result(player) }
+    results
+    reset_bets
     display_table
   end
 
-  def show_result(player)
+  def results
+    players.each { |player| result(player) }
+  end
+
+  def result(player)
     player.message =
       if player_won?(player)
         won_message(player)
