@@ -335,6 +335,7 @@ class Hand
   end
 end
 
+# Module for setting game rules
 module Rules
   SEATS = 5
   MIN_BET = 1
