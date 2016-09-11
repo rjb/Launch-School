@@ -712,7 +712,7 @@ class Game
   end
 
   def cash_out?(player)
-    puts "#{player.name}: Play another hand <enter> or cash out ($)?"
+    puts "#{player.name}: Play another hand (enter) or cash out ($)?"
     gets.chomp.start_with?('$')
   end
 
