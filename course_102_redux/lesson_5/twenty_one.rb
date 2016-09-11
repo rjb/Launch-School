@@ -200,7 +200,7 @@ class Shoe
   end
 
   def cut_card_hit?
-    cut_spot.nil? ? true : size <= cut_spot
+    size <= cut_spot
   end
 end
 
