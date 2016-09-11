@@ -5,7 +5,7 @@ module Currency
     'UK' => '£',
     'EU' => '€',
     'JP' => '¥'
-  }
+  }.freeze
 
   def format_as_currency(amount)
     format "#{Wallet::CURRENCY}%.2f", amount
@@ -46,7 +46,7 @@ class Wallet
   end
 
   def empty?
-    value == 0
+    value.zero?
   end
 end
 
@@ -136,7 +136,7 @@ class Dealer < Participant
     'GERTY',
     'RobotB-9',
     'Rosie'
-  ]
+  ].freeze
 
   def set_name
     self.name = NAMES.sample
@@ -154,7 +154,7 @@ end
 # Holds decks of cards from which cards are dealt
 class Shoe
   DECK_COUNT = 4
-  LOW_CARD_COUNT_MESSAGE = 'Low on cards. Last hand before shuffle.'
+  LOW_CARD_COUNT_MESSAGE = 'Low on cards. Last hand before shuffle.'.freeze
 
   attr_reader :cards, :cut_spot
 
@@ -188,7 +188,7 @@ class Shoe
   private
 
   def load_cards
-    DECK_COUNT.times { @cards.push(*Deck.new.cards) }
+    DECK_COUNT.times { @cards.concat(Deck.new.cards) }
   end
 
   def random_spot
@@ -206,7 +206,7 @@ end
 
 # Standard deck of playing cards
 class Deck
-  SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"]
+  SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"].freeze
   RANKS = ('2'..'10').to_a + %w(J Q K A)
 
   attr_accessor :cards
@@ -233,10 +233,10 @@ end
 
 # Class for creating cards with any value
 class Card
-  DOWN_CARD = "\u{1F0A0}"
-  CUT_CARD = "\u{1F0DF}"
-  UP_STATE = 'up'
-  DOWN_STATE = 'down'
+  DOWN_CARD = "\u{1F0A0}".freeze
+  CUT_CARD = "\u{1F0DF}".freeze
+  UP_STATE = 'up'.freeze
+  DOWN_STATE = 'down'.freeze
 
   attr_accessor :value
   attr_reader :state
@@ -315,7 +315,7 @@ class Hand
   end
 
   def empty?
-    count == 0
+    count.zero?
   end
 
   private
@@ -387,7 +387,7 @@ class Game
     loop do
       puts "How many players? (1-#{SEATS})"
       count = gets.chomp.to_i
-      break if (1..SEATS).include?(count)
+      break if (1..SEATS).cover?(count)
       puts "Enter a valid number, between 1 and #{SEATS}."
     end
     count
@@ -530,7 +530,7 @@ class Game
   end
 
   def show_dealers_hand
-    puts "#{dealer.name}"
+    puts dealer.name
     puts "#{show_total(dealer)} #{dealer.hand} #{show_message(dealer)}"
     puts
   end
@@ -578,7 +578,7 @@ class Game
   def player_turn(player)
     loop do
       puts "#{player.name}: Hit (h) or stand (s)?"
-      break unless gets.chomp.downcase == 'h'
+      break unless gets.chomp.casecmp('h').zero?
       deal_card(player)
       break if player.busted?
     end
@@ -681,7 +681,7 @@ class Game
   end
 
   def pay(player, payout = 0)
-    player.wallet.deposit(((payout) * player.bet) + player.bet)
+    player.wallet.deposit((payout * player.bet) + player.bet)
   end
 
   def boot_broke_players
