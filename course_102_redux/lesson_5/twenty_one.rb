@@ -527,24 +527,26 @@ class Game
 
   def show_dealers_hand
     puts dealer.name
-    puts "#{show_total(dealer)} #{dealer.hand} #{show_message(dealer)}"
+    puts "#{dealer.hand}"
+    puts "#{show_total(dealer)} #{show_message(dealer)}"
     puts
   end
 
   def show_players_hands
     players.each do |player|
       puts "#{player.name} #{show_wallet(player)} #{show_bet(player)}"
-      puts "#{show_total(player)} #{player.hand} #{show_message(player)}"
+      puts "#{player.hand}"
+      puts "#{show_total(player)} #{show_message(player)}"
       puts
     end
   end
 
   def show_total(participant)
-    "(#{participant.total})" unless participant.hand_empty?
+    "Total: #{participant.total}" unless participant.hand_empty?
   end
 
   def show_message(participant)
-    "- #{participant.message}" if participant.message
+    "| #{participant.message}" if participant.message
   end
 
   def show_wallet(player)
