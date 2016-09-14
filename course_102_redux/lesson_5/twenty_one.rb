@@ -206,8 +206,8 @@ end
 
 # Standard deck of playing cards
 class Deck
-  SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"].freeze
   RANKS = ('2'..'10').to_a + %w(J Q K A)
+  SUITS = ["\u{2660}", "\u{2665}", "\u{2666}", "\u{2663}"].freeze
 
   attr_accessor :cards
 
@@ -227,7 +227,7 @@ class Deck
   private
 
   def initialize_cards
-    RANKS.product(SUITS).each { |value| cards << Card.new(value) }
+    RANKS.product(SUITS).each { |value| cards << Card.new(*value) }
   end
 end
 
@@ -238,25 +238,21 @@ class Card
   UP_STATE = 'up'.freeze
   DOWN_STATE = 'down'.freeze
 
-  attr_accessor :value
-  attr_reader :state
+  attr_reader :rank, :suit, :state
 
-  def initialize(value, state = DOWN_STATE)
-    @value = value
+  def initialize(rank, suit, state = DOWN_STATE)
+    @rank = rank
+    @suit = suit
     @state = state
   end
 
   def to_s
-    face_up? ? value.join('') : DOWN_CARD
+    face_up? ? "#{rank}#{suit}" : DOWN_CARD
   end
 
   def flip
     @state = face_down? ? UP_STATE : DOWN_STATE
     self
-  end
-
-  def rank
-    value.first
   end
 
   def face_up?
@@ -268,7 +264,7 @@ class Card
   end
 
   def cut_card?
-    value == CUT_CARD
+    suit == CUT_CARD
   end
 end
 
