@@ -1,16 +1,18 @@
-# Handles displaying of messages, table, cards, etc.
+# Displaying of messages, table, and cards.
 module Display
   include Currency
 
+  DIVIDER = '-----------------------------'
+
   def display_table
     system 'clear'
-    puts Message.welcome
-    puts Message::DIVIDER
+    puts "Welcome to Twenty-One!\nTable minimum: #{format_as_currency(Rules::MIN_BET)}"
+    puts DIVIDER
     block_given? ? yield : display_shoe
-    puts Message::DIVIDER
+    puts DIVIDER
     display_dealers_hand
     display_players_hands
-    puts Message::DIVIDER
+    puts DIVIDER
   end
 
   def display_shuffling_deck
@@ -21,38 +23,46 @@ module Display
   end
 
   def display_player_count_request_message
-    puts Message.player_count_request
+    puts "How many players? (1-#{Rules::SEATS})"
   end
 
   def display_valid_player_count_message
-    puts Message.valid_player_count
+    puts "Enter a valid number between 1 and #{Rules::SEATS}."
   end
 
   def display_move_message(player)
-    puts Message.move(player)
+    puts "#{player.name}: Hit (h) or stand (s)?"
   end
 
   def display_place_bet_message(player)
-    puts Message.place_bet(player)
+    puts "#{player.name}: Place your bet."
     print Wallet::CURRENCY
   end
 
   def display_invalid_bet_message(player, bet)
-    puts Message.bet_too_low if bet < Rules::MIN_BET
-    puts Message.wallet_too_low if player.wallet < bet
+    puts 'Bet is too low.' if bet < Rules::MIN_BET
+    puts "You're wallet is a little light." if player.wallet < bet
   end
 
   def display_play_again_message(player)
-    puts Message.play_again(player)
+    puts "#{player.name}: Play another hand (enter) or cash out ($)?"
   end
 
   def display_out_of_cash_message(player)
-    puts Message.out_of_cash(player)
+    puts "#{player.name}: You're out of cash. Goodbye."
     sleep(3)
   end
 
   def display_table_closed_message
-    puts Message.table_closed
+    puts 'Table closed.'
+  end
+
+  def self.name_request_message
+    puts 'What is your name?'
+  end
+
+  def self.name_invalid_message
+    puts 'Invalid name.'
   end
 
   private
