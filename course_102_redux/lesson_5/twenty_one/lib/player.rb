@@ -11,10 +11,10 @@ class Player < Participant
   def set_name
     n = ''
     loop do
-      puts Message.name_request
+      Display.name_request_message
       n = gets.chomp
       break unless n.empty?
-      puts Message.name_invalid
+      Display.name_invalid_message
     end
     self.name = n
   end
