@@ -1,7 +1,6 @@
-# Logic and rules
+# Game engine
 class Game
-  include Rules
-  include Currency
+  include Display
 
   attr_reader :players, :dealer, :shoe
 
@@ -25,6 +24,7 @@ class Game
       # Round.new(dealer, players, shoe).play
       place_bets
       deal_initial_cards
+      check_for_twenty_one
       play_hand
       initialize_table
       break if table_empty?
@@ -41,10 +41,10 @@ class Game
   def player_count
     count = nil
     loop do
-      Display.player_count_request_message
+      display_player_count_request_message
       count = gets.chomp.to_i
-      break if (1..SEATS).cover?(count)
-      Display.valid_player_count_message
+      break if (1..Rules::SEATS).cover?(count)
+      display_valid_player_count_message
     end
     count
   end
@@ -64,11 +64,6 @@ class Game
     reset_bets
     reset_hands
     display_table
-  end
-
-  def play_initial_cards
-    deal_initial_cards
-    check_for_twenty_one
   end
 
   def play_hand
@@ -104,46 +99,6 @@ class Game
     display_table
   end
 
-  def display_shuffling_deck
-    cards = []
-    15.times { display_cards_growing(cards) }
-    15.times { display_cards_shrinking(cards) }
-    15.times { display_cards_growing(cards) }
-  end
-
-  def display_cards_growing(cards)
-    cards << Card::DOWN_CARD
-    display_table { puts cards.join(' ') }
-    sleep(0.05)
-  end
-
-  def display_cards_shrinking(cards)
-    cards.pop
-    display_table { puts cards.join(' ') }
-    sleep(0.05)
-  end
-
-  def display_shoe
-    shoe.low? ? Display.low_card_count_message : display_shoe_cards
-  end
-
-  def display_shoe_cards
-    shoe_cards = []
-    15.times { shoe_cards << Card::DOWN_CARD }
-    puts shoe_cards.join(' ')
-  end
-
-  def display_table
-    system 'clear'
-    puts Message.welcome
-    puts Message::DIVIDER
-    block_given? ? yield : display_shoe
-    puts Message::DIVIDER
-    show_dealers_hand
-    show_players_hands
-    puts Message::DIVIDER
-  end
-
   def place_bets
     players.each do |player|
       place_bet(player)
@@ -154,10 +109,10 @@ class Game
   def place_bet(player)
     bet = nil
     loop do
-      Display.place_bet_message(player)
+      display_place_bet_message(player)
       bet = gets.chomp.to_f
       break if valid_bet?(player, bet)
-      Display.invalid_bet_message(player, bet)
+      display_invalid_bet_message(player, bet)
     end
     player.bet = bet
   end
@@ -169,38 +124,6 @@ class Game
   def reveal_dealers_hand
     dealer.reveal_hand
     display_table
-  end
-
-  def show_dealers_hand
-    puts dealer.name
-    puts "#{dealer.hand}"
-    puts "#{show_total(dealer)} #{show_message(dealer)}"
-    puts
-  end
-
-  def show_players_hands
-    players.each do |player|
-      puts "#{player.name} #{show_wallet(player)} #{show_bet(player)}"
-      puts "#{player.hand}"
-      puts "#{show_total(player)} #{show_message(player)}"
-      puts
-    end
-  end
-
-  def show_total(participant)
-    "Total: #{participant.total}" unless participant.hand_empty?
-  end
-
-  def show_message(participant)
-    "| #{participant.message}" if participant.message
-  end
-
-  def show_wallet(player)
-    "| #{player.wallet}"
-  end
-
-  def show_bet(player)
-    player.made_bet? ? "| Bet: #{format_as_currency(player.bet)}" : ''
   end
 
   def active_players
@@ -216,7 +139,7 @@ class Game
 
   def player_turn(player)
     loop do
-      Display.move_message(player)
+      display_move_message(player)
       break unless gets.chomp.casecmp('h').zero?
       deal_card(player)
       break if player.busted?
@@ -298,9 +221,9 @@ class Game
   def award_winners
     players.each do |player|
       if player.twenty_one?
-        pay(player, TWENTY_ONE_PAYOUT)
+        pay(player, Rules::TWENTY_ONE_PAYOUT)
       elsif player_won?(player)
-        pay(player, STANDARD_PAYOUT)
+        pay(player, Rules::STANDARD_PAYOUT)
       elsif draw?(player)
         pay(player)
       end
@@ -314,8 +237,8 @@ class Game
   def boot_broke_players
     broke_players.each do |player|
       players.delete(player)
+      display_out_of_cash_message(player)
       display_table
-      Display.out_of_cash_message(player)
     end
   end
 
@@ -325,7 +248,7 @@ class Game
 
   def close_table
     reset_table
-    Display.table_closed_message
+    display_table_closed_message
   end
 
   def check_for_twenty_one
@@ -340,11 +263,11 @@ class Game
   end
 
   def cash_out?(player)
-    Display.play_again_message(player)
+    display_play_again_message(player)
     gets.chomp.start_with?('$')
   end
 
   def valid_bet?(player, bet)
-    bet >= MIN_BET && player.wallet >= bet
+    bet >= Rules::MIN_BET && player.wallet >= bet
   end
 end
