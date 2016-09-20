@@ -2,11 +2,12 @@
 module Display
   include Currency
 
-  DIVIDER = '-----------------------------'
+  DIVIDER = '-----------------------------'.freeze
 
   def display_table
     system 'clear'
-    puts "Welcome to Twenty-One!\nTable minimum: #{format_as_currency(Rules::MIN_BET)}"
+    puts "Welcome to Twenty-One!\n" \
+         "Table minimum: #{format_as_currency(Rules::MIN_BET)}"
     puts DIVIDER
     block_given? ? yield : display_shoe
     puts DIVIDER
@@ -70,7 +71,7 @@ module Display
   end
 
   def lost_message(player)
-    player.busted? ? 'Busted!' : "You lost."
+    player.busted? ? 'Busted!' : 'You lost.'
   end
 
   def draw_message
@@ -111,7 +112,7 @@ module Display
 
   def display_dealers_hand
     puts dealer.name
-    puts "#{dealer.hand}"
+    puts dealer.hand.to_s
     puts "#{total(dealer)} #{message(dealer)}"
     puts
   end
@@ -119,7 +120,7 @@ module Display
   def display_players_hands
     players.each do |player|
       puts "#{player.name} #{wallet(player)} #{bet(player)}"
-      puts "#{player.hand}"
+      puts player.hand.to_s
       puts "#{total(player)} #{message(player)}"
       puts
     end
