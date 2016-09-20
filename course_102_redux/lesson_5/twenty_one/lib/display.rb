@@ -57,6 +57,26 @@ module Display
     puts 'Table closed.'
   end
 
+  def twenty_one_message
+    'Twenty-One!'
+  end
+
+  def busted_message
+    'Busted!'
+  end
+
+  def won_message(player)
+    player.twenty_one? ? 'Twenty-One!' : 'Winner!'
+  end
+
+  def lost_message(player)
+    player.busted? ? 'Busted!' : "You lost."
+  end
+
+  def draw_message
+    'Draw.'
+  end
+
   def self.name_request_message
     puts 'What is your name?'
   end

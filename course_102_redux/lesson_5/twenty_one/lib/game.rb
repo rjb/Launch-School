@@ -21,7 +21,6 @@ class Game
 
   def play
     loop do
-      # Round.new(dealer, players, shoe).play
       place_bets
       deal_initial_cards
       check_for_twenty_one
@@ -154,7 +153,7 @@ class Game
   end
 
   def bust(participant)
-    participant.message = Message.busted
+    participant.message = busted_message
     display_table
   end
 
@@ -186,11 +185,11 @@ class Game
   def result(player)
     player.message =
       if player_won?(player)
-        Message.won(player)
+        won_message(player)
       elsif dealer_won?(player)
-        Message.lost(player)
+        lost_message(player)
       else
-        Message.draw
+        draw_message
       end
   end
 
@@ -253,7 +252,7 @@ class Game
 
   def check_for_twenty_one
     players.select(&:twenty_one?).each do |player|
-      player.message = Message.twenty_one
+      player.message = twenty_one_message
       display_table
     end
   end
