@@ -11,6 +11,5 @@ require_relative 'lib/rules'
 require_relative 'lib/round'
 require_relative 'lib/display'
 require_relative 'lib/game'
-require_relative 'lib/message'
 
 Game.new.start
