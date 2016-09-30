@@ -60,6 +60,12 @@ class TodoList
     @todos.fetch(idx)
   end
 
+  def done!
+    @todos.each_index do |idx|
+      mark_done_at(idx)
+    end
+  end
+
   def mark_done_at(idx)
     item_at(idx).done!
   end
