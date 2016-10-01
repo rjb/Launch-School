@@ -50,7 +50,7 @@ class TodoList
       yield(@todos[i])
       i += 1
     end
-    @todos
+    self
   end
 
   def select
