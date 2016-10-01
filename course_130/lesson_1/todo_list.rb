@@ -54,13 +54,11 @@ class TodoList
   end
 
   def select
-    results = []
-    i = 0
-    while i < @todos.length
-      results << @todos[i] if yield(@todos[i])
-      i += 1
+    list = TodoList.new(title)
+    each do |todo|
+      list.add(todo) if yield(todo)
     end
-    results
+    list
   end
 
   def size
