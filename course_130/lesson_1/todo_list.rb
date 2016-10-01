@@ -53,6 +53,16 @@ class TodoList
     @todos
   end
 
+  def select
+    results = []
+    i = 0
+    while i < @todos.length
+      results << @todos[i] if yield(@todos[i])
+      i += 1
+    end
+    results
+  end
+
   def size
     @todos.size
   end
@@ -132,3 +142,18 @@ list.add(todo3)
 
 puts "----#{list.title}----"
 list.each { |todo| puts todo }
+
+todo1 = Todo.new("Make dinner reservations")
+todo2 = Todo.new("Order new hard drive")
+todo3 = Todo.new("Email Elizabeth")
+
+list = TodoList.new("Friday's Todos")
+list.add(todo1)
+list.add(todo2)
+list.add(todo3)
+
+todo1.done!
+
+results = list.select { |todo| todo.done? }    # you need to implement this method
+
+puts results.inspect
