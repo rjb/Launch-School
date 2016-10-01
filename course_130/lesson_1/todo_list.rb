@@ -83,7 +83,7 @@ class TodoList
   end
 
   def remove_at(idx)
-    @todos.delete_at(item_at(idx))
+    @todos.delete(item_at(idx))
   end
 
   def to_s
