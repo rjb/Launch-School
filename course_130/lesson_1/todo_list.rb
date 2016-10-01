@@ -44,6 +44,15 @@ class TodoList
 
   alias_method :<<, :add
 
+  def each
+    i = 0
+    while i < @todos.length
+      yield(@todos[i])
+      i += 1
+    end
+    @todos
+  end
+
   def size
     @todos.size
   end
@@ -111,3 +120,15 @@ puts list
 list.mark_done_at(1)
 
 puts list
+
+todo1 = Todo.new("Walk the dog")
+todo2 = Todo.new("Write a blog post")
+todo3 = Todo.new("Call Joe")
+
+list = TodoList.new("Tomorrow's Todos")
+list.add(todo1)
+list.add(todo2)
+list.add(todo3)
+
+puts "----#{list.title}----"
+list.each { |todo| puts todo }
