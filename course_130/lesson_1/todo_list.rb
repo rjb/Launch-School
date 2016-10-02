@@ -108,6 +108,10 @@ class TodoList
     string << @todos.map(&:to_s).join("\n")
     string
   end
+
+  def to_a
+    @todos
+  end
 end
 
 todo1 = Todo.new("Buy milk")
@@ -155,3 +159,5 @@ todo1.done!
 results = list.select { |todo| todo.done? }    # you need to implement this method
 
 puts results.inspect
+
+p list.to_a
