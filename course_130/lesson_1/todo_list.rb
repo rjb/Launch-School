@@ -61,6 +61,30 @@ class TodoList
     list
   end
 
+  def find_by_title(str)
+    select { |todo| todo.title == str }.first
+  end
+
+  def all_done
+    select { |todo| todo.done? }
+  end
+
+  def all_not_done
+    select { |todo| !todo.done? }
+  end
+
+  def mark_done(str)
+    find_by_title(str) && find_by_title(str).done!
+  end
+
+  def mark_all_done
+    each { |todo| todo.done! }
+  end
+
+  def mark_all_undone
+    each { |todo| todo.undone! }
+  end
+
   def size
     @todos.size
   end
@@ -159,5 +183,12 @@ todo1.done!
 results = list.select { |todo| todo.done? }    # you need to implement this method
 
 puts results.inspect
-
-p list.to_a
+puts list.find_by_title('Email Elizabeth')
+puts list.all_done
+puts list.all_not_done
+list.mark_done('Email Elizabeth')
+puts list
+list.mark_all_done
+puts list
+list.mark_all_undone
+puts list
