@@ -65,6 +65,10 @@ class TodoList
     select { |todo| todo.title == str }.first
   end
 
+  def done?
+    @todos.all? { |todo| todo.done? }
+  end
+
   def all_done
     select { |todo| todo.done? }
   end
@@ -138,57 +142,58 @@ class TodoList
   end
 end
 
-todo1 = Todo.new("Buy milk")
-todo2 = Todo.new("Clean room")
-todo3 = Todo.new("Go to gym")
-
-list = TodoList.new("Today's Todos")
-list.add(todo1)
-list.add(todo2)
-list.add(todo3)
-
-puts list
-
-list.pop
-
-puts list
-
-list.mark_done_at(1)
-
-puts list
-
-todo1 = Todo.new("Walk the dog")
-todo2 = Todo.new("Write a blog post")
-todo3 = Todo.new("Call Joe")
-
-list = TodoList.new("Tomorrow's Todos")
-list.add(todo1)
-list.add(todo2)
-list.add(todo3)
-
-puts "----#{list.title}----"
-list.each { |todo| puts todo }
-
-todo1 = Todo.new("Make dinner reservations")
-todo2 = Todo.new("Order new hard drive")
-todo3 = Todo.new("Email Elizabeth")
-
-list = TodoList.new("Friday's Todos")
-list.add(todo1)
-list.add(todo2)
-list.add(todo3)
-
-todo1.done!
-
-results = list.select { |todo| todo.done? }    # you need to implement this method
-
-puts results.inspect
-puts list.find_by_title('Email Elizabeth')
-puts list.all_done
-puts list.all_not_done
-list.mark_done('Email Elizabeth')
-puts list
-list.mark_all_done
-puts list
-list.mark_all_undone
-puts list
+# todo1 = Todo.new("Buy milk")
+# todo2 = Todo.new("Clean room")
+# todo3 = Todo.new("Go to gym")
+# 
+# list = TodoList.new("Today's Todos")
+# list.add(todo1)
+# list.add(todo2)
+# list.add(todo3)
+# 
+# puts list
+# 
+# list.pop
+# 
+# puts list
+# 
+# list.mark_done_at(1)
+# 
+# puts list
+# 
+# todo1 = Todo.new("Walk the dog")
+# todo2 = Todo.new("Write a blog post")
+# todo3 = Todo.new("Call Joe")
+# 
+# list = TodoList.new("Tomorrow's Todos")
+# list.add(todo1)
+# list.add(todo2)
+# list.add(todo3)
+# 
+# puts "----#{list.title}----"
+# list.each { |todo| puts todo }
+# 
+# todo1 = Todo.new("Make dinner reservations")
+# todo2 = Todo.new("Order new hard drive")
+# todo3 = Todo.new("Email Elizabeth")
+# 
+# list = TodoList.new("Friday's Todos")
+# list.add(todo1)
+# list.add(todo2)
+# list.add(todo3)
+# 
+# todo1.done!
+# 
+# results = list.select { |todo| todo.done? }    # you need to implement this method
+# 
+# puts results.inspect
+# puts list.find_by_title('Email Elizabeth')
+# puts list.all_done
+# puts list.all_not_done
+# list.mark_done('Email Elizabeth')
+# puts list
+# list.mark_all_done
+# puts list
+# list.mark_all_undone
+# puts list
+# 
