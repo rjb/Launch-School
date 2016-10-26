@@ -10,10 +10,8 @@ class SecretHandshake
     @binary.size == KEYS.size + 1 && @binary[-1] == 1 ? result.reverse : result
     # Or
     # @binary.reverse.each_with_object([]).with_index do |(value, result), idx|
-    #   if value == 1
-    #     result << KEYS[idx] if idx < KEYS.size
-    #     result.reverse! if idx == KEYS.size
-    #   end
+      # next unless value == 1
+      # idx < KEYS.size ? result << KEYS[idx] : result.reverse!
     # end
   end
 
