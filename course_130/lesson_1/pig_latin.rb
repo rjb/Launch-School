@@ -3,7 +3,7 @@ class PigLatin
 
   def self.translate(phrase)
     phrase.split(/\W+/).map do |word|
-        idx = word.index(/[uxy][^aeiou]/) || word.index(/[aeio]/)
+        idx = word.index(/[uxy][^aeiou]|[aeio]/)
       "#{word[idx..-1]}#{word[0...idx]}ay"
     end.join(' ')
   end
