@@ -31,8 +31,8 @@ class Meetup
   private
 
   def days
-    days_in_month.times.with_object({}) do |i, days|
-      days[i + 1] = Date.new(@year, @month, i + 1).strftime('%A')
+    (1..days_in_month).each.with_object({}) do |i, days|
+      days[i] = Date.new(@year, @month, i).strftime('%A')
     end
   end
 
