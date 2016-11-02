@@ -6,16 +6,13 @@ class Clock
   end
 
   def self.at(hrs, mins = 0)
-    Clock.new(hrs, mins)
+    new(hrs, mins)
   end
 
   def to_s
     hrs = (minutes / 60) - (((minutes / 60) / 24) * 24)
     mins = minutes % 60
-
-    (hrs <= 9 ? '0' : '') + hrs.to_s +
-    ':' +
-    (mins <= 9 ? '0' : '') + mins.to_s
+    format('%02d:%02d', hrs, mins)
   end
 
   def +(num)
