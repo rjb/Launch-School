@@ -1,42 +1,36 @@
-class CircularBuffer
-  BufferEmptyException = 'Buffer empty'
-  BufferFullException  = 'Buffer full'
+class BufferEmptyException < StandardError; end
+class BufferFullException < StandardError; end
 
+class CircularBuffer
   def initialize(size)
-    @buffer = Array.new(size) { |item| item = '' }
+    @buffer = Array.new(size) { '' }
   end
 
   def read
-    raise BufferEmptyException if buffer_empty?
-    oldest = @buffer.select { |item| !item.empty? }.min
-    @buffer[@buffer.index(oldest)] = ''
-    oldest
+    raise BufferEmptyException if @buffer.all?(&:empty?)
+    old = oldest
+    @buffer[@buffer.index(old)] = ''
+    old
   end
 
   def write(item)
-    raise BufferFullException if buffer_full?
-    @buffer[@buffer.index('')] = item.to_s if item
+    raise BufferFullException if @buffer.none?(&:empty?)
+    @buffer[@buffer.index('')] = item.to_s unless item.nil?
   end
 
   def write!(item)
-    if item
-      idx = @buffer.index('') || @buffer.index(@buffer.select { |item| !item.empty? }.min)
-      @buffer[idx] = item.to_s
-    end
+    idx = @buffer.index('') || @buffer.index(oldest)
+    @buffer[idx] = item.to_s unless item.nil?
   end
 
   def clear
-    @buffer = Array.new(@buffer.size) { |item| item = '' }
+    @buffer = Array.new(@buffer.size) { '' }
   end
 
   private
 
-  def buffer_empty?
-    @buffer.all? { |item| item.empty? }
-  end
-
-  def buffer_full?
-    @buffer.all? { |item| !item.empty? }
+  def oldest
+    @buffer.select { |item| !item.empty? }.min
   end
 end
 
