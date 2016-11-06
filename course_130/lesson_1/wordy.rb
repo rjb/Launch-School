@@ -4,7 +4,7 @@ class WordProblem
     'minus' => '-',
     'divided' => '/',
     'multiplied' => '*'
-    }.freeze
+  }.freeze
 
   def initialize(problem)
     @nums = problem.scan(/-?\d+/).map(&:to_i)
@@ -14,7 +14,7 @@ class WordProblem
   end
 
   def answer
-    raise ArgumentError if @ops.empty?
+    raise ArgumentError if @ops.empty? || @nums.size < 2
     @ops.each_with_index.reduce(@nums[0]) do |total, (op, idx)|
       total.send op, @nums[idx + 1]
     end
