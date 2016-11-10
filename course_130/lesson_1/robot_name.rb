@@ -3,8 +3,8 @@ class Robot
 
   @names = []
 
-  def self.names
-    @names
+  class << self
+    attr_reader :names
   end
 
   def initialize
